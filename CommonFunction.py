@@ -13,7 +13,6 @@ import websockets
 import pymysql
 from pytz import timezone
 from bs4 import BeautifulSoup as bs
-import ETFStockList as ETFStockList
 
 path = os.getcwd()
 if 'ec2-user' in path:

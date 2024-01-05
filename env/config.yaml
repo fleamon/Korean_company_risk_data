@@ -1,0 +1,17 @@
+# 홈페이지에서 API서비스 신청시 받은 Appkey, Appsecret 값 설정
+APP_KEY: "PSvKly9aiHSmLx4igOjETTgG0wFFf2YMy7q2"
+APP_SECRET: "sRRNrPO6LQekyOJkv1VrPGBAbxFM2/7r0lIjzHQ6xSDiGalgdZDNTzMNzuGFQUN7EnKq2ZrQd/qoPlxh2jUlP08PH1F3ZZ5rhhHKArIltEcy/dP3UEx4qmMROpVBqhuTPlJ0rd0vkleLL/i7fWLYdLExPmW6cKntG8fpMkmYnR6lgezc+wo="
+
+# 계좌번호 앞 8자리
+CANO: "63636719"
+# 계좌번호 뒤 2자리
+ACNT_PRDT_CD: "01"
+
+# 실전투자
+URL_BASE: "https://openapi.koreainvestment.com:9443"
+OPTION_URL_BASE: "ws://ops.koreainvestment.com:21000"
+# 모의투자
+# URL_BASE: "https://openapivts.koreainvestment.com:29443"
+
+# 디스코드 웹훅 URL
+DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1064271724184608948/IlbVL2ik7soGu-Hyr9DqFDRutLciuzAq95pNzH1tisPH1pwXq2WFN_5CJgcn3wNoHWhl"
