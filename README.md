@@ -26,9 +26,8 @@ create database stock_Korean_by_ESG_BackData;
 ## 실행
 
 - 하루에 한번가져와야되는 데이터 DailyMain.py
-- 일정간격으로 돌아야하는 batch TermBatchMain.py
+- 일정간격으로 돌아야하는 batch TermBatchMain.py (??)
 
 ```bash
 python DailyMain.py
-python TermBatchMain.py
 ```
