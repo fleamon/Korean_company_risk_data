@@ -218,6 +218,13 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
     cursor = conn.cursor()
 
     for index, row in df.iterrows():
+        delete_query = f'''
+            DELETE FROM stock_Korean_by_ESG_BackData.news_articles
+             WHERE article_reg_date = {row["article_reg_date"]}
+               AND company_name = {row["company_name"]}
+        '''
+        cursor.execute(delete_query)
+
         insert_query = f'''
             INSERT INTO stock_Korean_by_ESG_BackData.news_articles 
             (article_reg_date, article_link, company_name, news_agency, title, article_text, load_date)
@@ -230,7 +237,6 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
             title=VALUES(title), 
             article_text=VALUES(article_text)
         '''
-
         cursor.execute(insert_query)
         
     conn.commit()
