@@ -144,6 +144,8 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
         
         page = page + 10
     
+    to_remove_url = []
+    
     for naver_url in article_link:
         naver_original_html = requests.get(naver_url, headers=headers)
         print ("naver_original_html status : ", naver_original_html)
@@ -151,6 +153,9 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
 
         # 기사 발행일
         html_date = naver_html.select_one("div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span")
+        if html_date is None:
+            to_remove_url.append(naver_url)
+            continue
         news_date = html_date.attrs['data-date-time']
         article_reg_date.append(news_date)
 
@@ -189,6 +194,9 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
         titles.append(title)
         article_text.append(article)
         
+    for remove_url in to_remove_url:
+        article_link.remove(remove_url)
+
     result= {
             "article_reg_date" : article_reg_date
             , "article_link": article_link
