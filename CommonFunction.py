@@ -89,11 +89,11 @@ def crawling_articles_from_keyword():
     try:
         maxpage = "1"
         # querys = ["카카오+김범수"]
-        # querys = ["삼성전자+이재용"]
-        querys = ["카카오+김범수", "삼성전자+이재용"]
+        querys = ["삼성전자+이재용"]
+        # querys = ["카카오+김범수", "삼성전자+이재용"]
         sort = "0"
-        start_date = "2024.01.01"
-        end_date = "2023.01.01"
+        start_date = "2021.01.31"
+        end_date = "2020.02.01"
         
         for i in range(0, len(querys)):
             print (querys[i])
@@ -220,8 +220,8 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
     for index, row in df.iterrows():
         delete_query = f'''
             DELETE FROM stock_Korean_by_ESG_BackData.news_articles
-             WHERE article_reg_date = {row["article_reg_date"]}
-               AND company_name = {row["company_name"]}
+             WHERE article_reg_date = '{row["article_reg_date"]}'
+               AND company_name = '{row["company_name"]}'
         '''
         cursor.execute(delete_query)
 
