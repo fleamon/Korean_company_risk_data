@@ -43,8 +43,6 @@ def insert_Korean_all_code_info_to_DB():
 
         conn = connect_to_db()
         cursor = conn.cursor()
-
-        cursor = conn.cursor()
         truncate_query = """TRUNCATE TABLE stock_Korean_by_ESG_BackData.Korean_all_code_info"""
         cursor.execute(truncate_query)
         conn.commit()
@@ -88,13 +86,29 @@ def crawling_articles_from_keyword():
     print([time.strftime('%Y-%m-%d %H:%M:%S')], "!!!!! DEBUG PRINT : 뉴스기사 DB 저장 !!!!!")
     try:
         maxpage = "1"
-        # querys = ["카카오+김범수"]
-        querys = ["삼성전자+이재용"]
+        querys = ["카카오+김범수"]
+        # querys = ["삼성전자+이재용"]
         # querys = ["카카오+김범수", "삼성전자+이재용"]
         sort = "0"
-        start_date = "2024.01.01"
-        end_date = "2024.01.01"
+        start_date = "2023.12.31"
+        end_date = "2023.01.01"
         
+        for i in range(0, len(querys)):
+            print (querys[i])
+            start_datetime = datetime.strptime(start_date, "%Y.%m.%d")
+            end_datetime = datetime.strptime(end_date, "%Y.%m.%d")
+            # 시작 날짜부터 종료 날짜까지 하루씩 감소
+            current_datetime = start_datetime
+            while current_datetime >= end_datetime:
+                crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
+                current_datetime -= timedelta(days=1)
+                naver_news_crawler(maxpage, querys[i], sort, crawling_date_id) 
+                print ("5 seconds sleep...")
+                time.sleep(5)
+
+        querys = ["삼성전자+이재용"]
+        start_date = "2021.01.31"
+        end_date = "2020.02.01"
         for i in range(0, len(querys)):
             print (querys[i])
             start_datetime = datetime.strptime(start_date, "%Y.%m.%d")
@@ -177,14 +191,17 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
         pattern1 = '<[^>]*>'
         pattern2 = '"'
         pattern3 = "'"
+        pattern4 = '\t'
 
         title = re.sub(pattern=pattern1, repl='', string=str(title))
         title = re.sub(pattern=pattern2, repl='', string=str(title))
         title = re.sub(pattern=pattern3, repl='', string=str(title))
+        title = re.sub(pattern=pattern4, repl='', string=str(title))
         
         article = re.sub(pattern=pattern1, repl='', string=article)
         article = re.sub(pattern=pattern2, repl='', string=article)
         article = re.sub(pattern=pattern3, repl='', string=article)
+        article = re.sub(pattern=pattern4, repl='', string=article)
         
         titles.append(title)
         article_text.append(article)
@@ -218,7 +235,7 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
             AND company_name = '{query.split("+")[0]}'
     '''
     cursor.execute(delete_query)
-    
+
     for index, row in df.iterrows():
         insert_query = f'''
             INSERT INTO stock_Korean_by_ESG_BackData.news_articles 
@@ -235,6 +252,7 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
         cursor.execute(insert_query)
         
     conn.commit()
+    cursor.close()
     conn.close()
 
 
