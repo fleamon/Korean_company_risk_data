@@ -92,8 +92,8 @@ def crawling_articles_from_keyword():
         querys = ["삼성전자+이재용"]
         # querys = ["카카오+김범수", "삼성전자+이재용"]
         sort = "0"
-        start_date = "2021.01.31"
-        end_date = "2020.02.01"
+        start_date = "2024.01.01"
+        end_date = "2024.01.01"
         
         for i in range(0, len(querys)):
             print (querys[i])
@@ -175,22 +175,17 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
         
         # html태그제거 및 텍스트 다듬기
         pattern1 = '<[^>]*>'
+        pattern2 = '"'
+        pattern3 = "'"
+
         title = re.sub(pattern=pattern1, repl='', string=str(title))
-        title = re.sub(r'[^\w\s]', '', title)
-        title = title.replace("'", "")
-        title = title.replace('"', "")
-        title = re.sub(r'[\[\]\(\)]', '', title)
-        title = re.sub(r'[\n\t]', '', title)
-
+        title = re.sub(pattern=pattern2, repl='', string=str(title))
+        title = re.sub(pattern=pattern3, repl='', string=str(title))
+        
         article = re.sub(pattern=pattern1, repl='', string=article)
-        pattern2 = """[\n\n\n\n\n// flash 오류를 우회하기 위한 함수 추가\nfunction _flash_removeCallback() {}"""
-        article = article.replace(pattern2, '')
-        article = re.sub(r'[^\w\s]', '', article)
-        article = article.replace("'", "")
-        article = article.replace('"', "")
-        article = re.sub(r'[\[\]\(\)]', '', article)
-        article = re.sub(r'[\n\t]', '', article)
-
+        article = re.sub(pattern=pattern2, repl='', string=article)
+        article = re.sub(pattern=pattern3, repl='', string=article)
+        
         titles.append(title)
         article_text.append(article)
         
@@ -212,19 +207,19 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
     # now = datetime.now()  # 파일이름 현 시간으로 저장하기
     # outputFileName = f'articles_from_naver_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}_{now.second}.xlsx'
     # df.to_excel('/Users/kakao/Downloads/'+outputFileName,sheet_name='sheet1')
-
-    # DB에 insert
+    
+    # DB에 delete - insert
     conn = connect_to_db()
     cursor = conn.cursor()
 
+    delete_query = f'''
+        DELETE FROM stock_Korean_by_ESG_BackData.news_articles
+            WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
+            AND company_name = '{query.split("+")[0]}'
+    '''
+    cursor.execute(delete_query)
+    
     for index, row in df.iterrows():
-        delete_query = f'''
-            DELETE FROM stock_Korean_by_ESG_BackData.news_articles
-             WHERE article_reg_date = '{row["article_reg_date"]}'
-               AND company_name = '{row["company_name"]}'
-        '''
-        cursor.execute(delete_query)
-
         insert_query = f'''
             INSERT INTO stock_Korean_by_ESG_BackData.news_articles 
             (article_reg_date, article_link, company_name, news_agency, title, article_text, load_date)
@@ -241,7 +236,7 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
         
     conn.commit()
     conn.close()
-    
+
 
 def send_message(market, msg):
     """디스코드 메세지 전송"""
