@@ -81,18 +81,12 @@ def insert_Korean_all_code_info_to_DB():
         time.sleep(1)
 
 
-def crawling_articles_from_keyword():
+def crawling_articles_from_keyword(querys, start_date, end_date):
     """뉴스기사 DB 저장"""
     print([time.strftime('%Y-%m-%d %H:%M:%S')], "!!!!! DEBUG PRINT : 뉴스기사 DB 저장 !!!!!")
     try:
-        maxpage = "1"
-        # querys = ["카카오+김범수"]
-        querys = ["삼성전자+이재용"]
-        # querys = ["카카오+김범수", "삼성전자+이재용"]
-        sort = "0"
-        start_date = "2024.02.06"
-        end_date = "2023.01.01"
-        
+        maxpage = "1"  # 검색어 넣은 마지막 페이지
+        sort = "0"  # 0:관련도순, 1:최신순, 2:오래된순
         for i in range(0, len(querys)):
             print (querys[i])
             start_datetime = datetime.strptime(start_date, "%Y.%m.%d")
