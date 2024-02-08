@@ -13,13 +13,15 @@ def DailyMain():
     
     # 뉴스기사 crawling
     # querys = ["카카오+김범수"]
-    querys = ["삼성전자+이재용"]
+    # querys = ["삼성전자+이재용"]
+    # querys = ["VCNC+박재욱"]
+    querys = ["타다+박재욱"]
     # querys = ["카카오+김범수", "삼성전자+이재용"]
-    start_date = "2024.02.06"
-    end_date = "2024.02.01"
-    # cf.crawling_articles_from_keyword(querys, start_date, end_date)
+    start_date = "2020.06.30"
+    end_date = "2019.03.01"
+    cf.crawling_articles_from_keyword(querys, start_date, end_date)
 
-    Score_by_BERT
+    # Score_by_BERT
 
 
 if __name__ == '__main__':

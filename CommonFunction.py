@@ -210,6 +210,7 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
     delete_query = f'''
         DELETE FROM stock_Korean_by_ESG_BackData.news_articles
             WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
+            AND search_keyword = '{query}'
             AND company_name = '{query.split("+")[0]}'
     '''
     cursor.execute(delete_query)
@@ -217,10 +218,10 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id):
     for index, row in df.iterrows():
         insert_query = f'''
             INSERT INTO stock_Korean_by_ESG_BackData.news_articles 
-            (article_reg_date, article_link, company_name, news_agency, title, article_text, load_date)
+            (article_reg_date, article_link, company_name, news_agency, search_keyword, title, article_text, load_date)
             VALUES 
             ('{row["article_reg_date"]}', '{row["article_link"]}'
-            , '{row["company_name"]}', '{row["news_agency"]}'
+            , '{row["company_name"]}', '{row["news_agency"]}', '{query}'
             , '{row["titles"]}', '{row["article_text"]}', NOW())
             ON DUPLICATE KEY UPDATE 
             article_link=VALUES(article_link), 
