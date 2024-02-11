@@ -40,6 +40,11 @@ def insert_Korean_all_code_info_to_DB():
         # 한국 모든 종목 정보
         Korean_all_code_file = pd.read_csv(f'{path}/csv_file/Korean_all_code.csv', encoding='CP949')
         # print (Korean_all_code_file)
+        Korean_all_code_ceo_file = pd.read_csv(f'{path}/csv_file/Korean_all_code_ceo.csv', encoding='CP949')
+        Korean_all_code_ceo_file['종목코드'] = Korean_all_code_ceo_file['종목코드'].astype(str)  # join에 형변환 필요
+        # print (Korean_all_code_ceo_file)
+        Korean_all_code_merged_df = pd.merge(Korean_all_code_file, Korean_all_code_ceo_file, left_on='한글 종목약명', right_on='종목명', how='left')
+        # print (Korean_all_code_merged_df)
 
         conn = connect_to_db()
         cursor = conn.cursor()
@@ -47,25 +52,27 @@ def insert_Korean_all_code_info_to_DB():
         cursor.execute(truncate_query)
         conn.commit()
         
-        for index, row in Korean_all_code_file.iterrows():
+        for index, row in Korean_all_code_merged_df.iterrows():
+            # print (row)
             sql = """
-            INSERT INTO stock_Korean_by_ESG_BackData.Korean_all_code_info (standard_code, short_code, Korean_name, Korean_short_name,
+            INSERT INTO stock_Korean_by_ESG_BackData.Korean_all_code_info (standard_code, short_code, Korean_name, Korean_short_name, ceo_name,
             English_name, stock_reg_date_id, market_type, bond_type, attach_part, stock_type, reg_price, shares_number)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             values = (
                 str(row['표준코드']),
                 str(row['단축코드']),
                 str(row['한글 종목명']),
                 str(row['한글 종목약명']),
+                str(row['대표이사']),
                 str(row['영문 종목명']),
                 str(row['상장일']),
-                str(row['시장구분']),
+                str(row['시장구분_x']),
                 str(row['증권구분']),
-                str(row['소속부']),
+                str(row['소속부_x']),
                 str(row['주식종류']),
-                str(row['액면가']),
-                str(row['상장주식수'])
+                str(row['액면가_x']),
+                str(row['상장주식수_x'])
             )
             cursor.execute(sql, values)
 
