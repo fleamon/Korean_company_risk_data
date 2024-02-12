@@ -12,14 +12,11 @@ def DailyMain():
     # cf.insert_Korean_all_code_info_to_DB()
     
     # 뉴스기사 crawling
-    # querys = ["카카오+김범수"]
-    # querys = ["삼성전자+이재용"]
-    # querys = ["VCNC+박재욱"]
-    querys = ["타다+박재욱"]
-    # querys = ["카카오+김범수", "삼성전자+이재용"]
-    start_date = "2020.06.30"
-    end_date = "2019.03.01"
-    cf.crawling_articles_from_keyword(querys, start_date, end_date)
+    querys = ["토스+이승건"]
+    start_date = "2023.06.30"
+    end_date = "2022.07.01"
+    is_public = True
+    cf.crawling_articles_from_keyword(querys, start_date, end_date, is_public)
 
     # Score_by_BERT
 

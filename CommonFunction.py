@@ -88,8 +88,12 @@ def insert_Korean_all_code_info_to_DB():
         time.sleep(1)
 
 
-def crawling_articles_from_keyword(querys, start_date, end_date):
+def crawling_articles_from_keyword(querys, start_date, end_date, is_public):
     """뉴스기사 DB 저장"""
+    # TOBE : Korean_all_code_info 에서 Korean_short_name+ceo_name 이 query로 들어가야함
+    # ceo_name 에 대해서 data cleansing 필요함
+    # is_public 변수(True, False) 로 상장 / 비상장 구분
+    # 상장회사는 Korean_all_code_info 매일 모두 크롤링, 비상장회사는 필요한 회사 받아오도록 수정
     print([time.strftime('%Y-%m-%d %H:%M:%S')], "!!!!! DEBUG PRINT : 뉴스기사 DB 저장 !!!!!")
     try:
         maxpage = "1"  # 검색어 넣은 마지막 페이지
