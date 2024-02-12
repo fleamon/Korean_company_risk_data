@@ -16,9 +16,9 @@ def DailyMain():
     start_date = "2023.06.30"
     end_date = "2022.07.01"
     is_public = True
-    cf.crawling_articles_from_keyword(querys, start_date, end_date, is_public)
+    # cf.crawling_articles_from_keyword(querys, start_date, end_date, is_public)
 
-    # Score_by_BERT
+    Score_by_BERT
 
 
 if __name__ == '__main__':
