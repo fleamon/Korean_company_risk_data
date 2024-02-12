@@ -34,7 +34,13 @@ def connect_to_db():
 
 
 def insert_Korean_all_code_info_to_DB():
-    """한국 모든 종목 정보 DB에 저장"""
+    """
+    한국 모든 종목 정보 DB에 저장
+    파일 출처는 모두 http://data.krx.co.kr/contents/MDC/MDI/mdiLoader/index.cmd?menuId=MDC0201040201#
+    주식 > 종목정보 > 전종목 기본정보
+    주식 > 세부안내 > 상장회사 상세검색
+    위 두개의 csv파일
+    """
     print([time.strftime('%Y-%m-%d %H:%M:%S')], "!!!!! DEBUG PRINT : 한국 모든 종목 정보 DB에 저장 !!!!!")
     try:
         # 한국 모든 종목 정보
@@ -82,7 +88,7 @@ def insert_Korean_all_code_info_to_DB():
 
         send_message("KOR", "한국 모든 종목 정보 저장 success!")
         print("한국 모든 종목 정보 저장 successfully.")
-        
+
     except Exception as e:
         send_message("ERROR", f"한국 모든 종목 정보 DB에 저장 [오류 발생]{e}")
         time.sleep(1)
