@@ -4,7 +4,7 @@ import sys
 from pytz import timezone
 
 import CommonFunction as cf
-import ScoringByModel.bert_score as bert_score
+import ScoringByModel.after_scoring as after_scoring
 
 
 def DailyMain():
@@ -19,7 +19,7 @@ def DailyMain():
     # cf.crawling_articles_from_keyword(querys, start_date, end_date, is_public)
 
     # bert 스코어링
-    bert_score
+    after_scoring
 
 
 if __name__ == '__main__':
