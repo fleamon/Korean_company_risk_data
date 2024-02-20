@@ -11,7 +11,7 @@ def main():
     conn.commit()
             
     # dill 파일에서 데이터 읽기
-    with open('./ScoringByModel/dill_files/20240215_0038_score_dataframes.dill', 'rb') as f:
+    with open('./dill_files/20240215_0038_score_dataframes.dill', 'rb') as f:
         data = dill.load(f)
 
     # print (data)  # type : <class 'pandas.core.frame.DataFrame'>
