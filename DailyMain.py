@@ -6,7 +6,7 @@ from pytz import timezone
 import CommonFunction as cf
 import CrawlingArticle.CrawlingFunction as crawl
 import ScoringByBert.bert_scoring as bert_scoring
-import ScoringByKeyword.esg_keyword as esg_keyword
+import ScoringByKeyword.keyword_scoring as keyword_scoring
 
 
 def DailyMain():
@@ -25,7 +25,7 @@ def DailyMain():
     bert_scoring.main()
     """
     # keyword로 스코어링
-    esg_keyword.main()
+    keyword_scoring.main()
 
 
 if __name__ == '__main__':
