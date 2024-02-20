@@ -31,7 +31,7 @@ def main():
     scores_df['article_index'] = daily_com_grouped_df['article_positive_score'] -  daily_com_grouped_df['article_negative_score']
     print (scores_df)  # type : <class 'pandas.core.frame.DataFrame'>
     scores_df_columns = ', '.join(scores_df.columns)
-    print(scores_df_columns)  #type : <class 'str'>
+    print (scores_df_columns)  #type : <class 'str'>
 
     # MySQL 테이블 생성
     create_table_query = """
@@ -72,5 +72,5 @@ def main():
     cursor.close()
     conn.close()
 
-    cf.send_message("KOR", "scoring success by score_dataframes.dill")
-    print("스코어링 데이터 저장 successfully.")
+    cf.send_message("KOR", "Bert scoring success by score_dataframes.dill")
+    print(" Bert 스코어링 데이터 저장 successfully.")
