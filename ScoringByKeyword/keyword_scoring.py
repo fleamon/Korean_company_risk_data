@@ -233,13 +233,13 @@ def main():
 
     conn = cf.connect_to_db()
     cursor = conn.cursor()
-    truncate_query = """TRUNCATE TABLE stock_Korean_by_ESG_BackData.news_articles_posi_nega_scoring"""
+    truncate_query = """TRUNCATE TABLE stock_Korean_by_ESG_BackData.articles_posi_nega_scoring"""
     cursor.execute(truncate_query)
     conn.commit()
     
     # MySQL 테이블 생성
     create_table_query = """
-    CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.news_articles_posi_nega_scoring (
+    CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.articles_posi_nega_scoring (
     seq bigint NOT NULL AUTO_INCREMENT,
     date_id date DEFAULT NULL COMMENT '날짜',
     LG_positive double DEFAULT NULL COMMENT 'LG긍정Score',
@@ -290,7 +290,7 @@ def main():
         # print (row)  # type : <class 'pandas.core.series.Series'>
         # break
         insert_query = f'''
-            INSERT INTO stock_Korean_by_ESG_BackData.news_articles_posi_nega_scoring
+            INSERT INTO stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
             (date_id, {merged_df_columns}, load_date)
             VALUES
             ('{str(row.name).split(' ')[0]}'

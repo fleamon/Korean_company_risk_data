@@ -169,7 +169,7 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
     cursor = conn.cursor()
 
     delete_query = f'''
-        DELETE FROM stock_Korean_by_ESG_BackData.news_articles
+        DELETE FROM stock_Korean_by_ESG_BackData.articles
             WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
             AND search_keyword = '{query}'
             AND portal_name = '{portal_name}'
@@ -179,7 +179,7 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
 
     for index, row in df.iterrows():
         insert_query = f'''
-            INSERT INTO stock_Korean_by_ESG_BackData.news_articles 
+            INSERT INTO stock_Korean_by_ESG_BackData.articles 
             (article_reg_date, portal_name, article_link, company_name, news_agency, search_keyword, title, article_text, load_date)
             VALUES 
             ('{row["article_reg_date"]}', '{portal_name}', '{row["article_link"]}'
@@ -297,7 +297,7 @@ def daum_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
     cursor = conn.cursor()
 
     delete_query = f'''
-        DELETE FROM stock_Korean_by_ESG_BackData.news_articles
+        DELETE FROM stock_Korean_by_ESG_BackData.articles
             WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
             AND search_keyword = '{query}'
             AND portal_name = '{portal_name}'
@@ -307,7 +307,7 @@ def daum_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
 
     for index, row in df.iterrows():
         insert_query = f'''
-            INSERT INTO stock_Korean_by_ESG_BackData.news_articles 
+            INSERT INTO stock_Korean_by_ESG_BackData.articles 
             (article_reg_date, portal_name, article_link, company_name, news_agency, search_keyword, title, article_text, load_date)
             VALUES 
             ('{row["article_reg_date"]}', '{portal_name}', '{row["article_link"]}'

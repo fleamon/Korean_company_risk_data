@@ -6,7 +6,7 @@ import pandas as pd
 def main():
     conn = cf.connect_to_db()
     cursor = conn.cursor()
-    truncate_query = """TRUNCATE TABLE stock_Korean_by_ESG_BackData.news_articles_bert_scoring"""
+    truncate_query = """TRUNCATE TABLE stock_Korean_by_ESG_BackData.articles_bert_scoring"""
     cursor.execute(truncate_query)
     conn.commit()
             
@@ -35,7 +35,7 @@ def main():
 
     # MySQL 테이블 생성
     create_table_query = """
-    CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.news_articles_bert_scoring (
+    CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.articles_bert_scoring (
     seq bigint NOT NULL AUTO_INCREMENT,
     date_id date DEFAULT NULL COMMENT '날짜',
     company_name varchar(255) DEFAULT NULL COMMENT '기업명',
@@ -55,7 +55,7 @@ def main():
         # print (row.name)  # (datetime.date(2020, 12, 7), '삼성전자')
         # print (row)  # type : <class 'pandas.core.series.Series'>
         insert_query = f'''
-            INSERT INTO stock_Korean_by_ESG_BackData.news_articles_bert_scoring
+            INSERT INTO stock_Korean_by_ESG_BackData.articles_bert_scoring
             (date_id, company_name, {scores_df_columns}, load_date)
             VALUES
             ('{row.name[0]}', '{row.name[1]}'
