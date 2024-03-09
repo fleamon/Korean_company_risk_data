@@ -56,8 +56,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         while current_datetime >= end_datetime:
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
-            naver_news_crawler(maxpage, query, sort, crawling_date_id, '네이버') 
-            # daum_news_crawler(maxpage, query, sort, crawling_date_id, '다음') 
+            # naver_news_crawler(maxpage, query, sort, crawling_date_id, '네이버') 
+            daum_news_crawler(maxpage, query, sort, crawling_date_id, '다음') 
             print ("5 seconds sleep...")
             time.sleep(5)
 

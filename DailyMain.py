@@ -7,6 +7,7 @@ import CommonFunction as cf
 import CrawlingArticle.CrawlingFunction as crawl
 import ScoringByBert.bert_scoring as bert_scoring
 import ScoringByKeyword.keyword_scoring as keyword_scoring
+import CompareByKeyword.compare_scoring as compare_scoring
 
 
 def DailyMain():
@@ -16,7 +17,7 @@ def DailyMain():
     '''
     # 종목정보 저장 (csv 파일은 일단 수동 저장필요함)
     cf.insert_Korean_all_code_info_to_DB()
-    '''
+    
 
     # 뉴스기사 crawling (네이버, 다음)
     company_ceo_name_list = crawl.get_company_ceo_name()
@@ -27,13 +28,14 @@ def DailyMain():
         is_public = True
         crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
 
-    """
     # bert 스코어링 결과 저장
     bert_scoring.main()
     
     # keyword로 스코어링
     keyword_scoring.main()
-    """
+    '''
+    # 키워드비교 스코어링
+    compare_scoring.main()
 
 
 if __name__ == '__main__':
