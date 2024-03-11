@@ -147,6 +147,36 @@ def insert_Korean_all_code_info_to_DB():
         time.sleep(1)
 
 
+def get_company_ceo_name():
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    company_ceo_name_list = []
+    company_ceo_select_query = '''
+        SELECT Korean_short_name
+             , ceo_name
+          FROM stock_Korean_by_ESG_BackData.Korean_all_code_info
+    '''
+    cursor.execute(company_ceo_select_query)
+    results = cursor.fetchall()
+    
+    for row in results:
+        if ',' in row[1]:
+            for ceo_name in row[1].split(','):
+                query = row[0]+'+'+ceo_name
+                company_ceo_name_list.append(query)
+        elif row[1] == '':
+            query = row[0]
+            company_ceo_name_list.append(query)
+        else:
+            query = row[0]+'+'+row[1]
+            company_ceo_name_list.append(query)
+    cursor.close()
+    conn.close()
+
+    return company_ceo_name_list
+
+
 def send_message(market, msg):
     """디스코드 메세지 전송"""
     now = datetime.now()

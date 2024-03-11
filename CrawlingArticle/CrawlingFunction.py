@@ -8,36 +8,6 @@ import re
 import CommonFunction as cf
 
 
-def get_company_ceo_name():
-    conn = cf.connect_to_db()
-    cursor = conn.cursor()
-
-    company_ceo_name_list = []
-    company_ceo_select_query = '''
-        SELECT Korean_short_name
-             , ceo_name
-          FROM stock_Korean_by_ESG_BackData.Korean_all_code_info
-    '''
-    cursor.execute(company_ceo_select_query)
-    results = cursor.fetchall()
-    
-    for row in results:
-        if ',' in row[1]:
-            for ceo_name in row[1].split(','):
-                query = row[0]+'+'+ceo_name
-                company_ceo_name_list.append(query)
-        elif row[1] == '':
-            query = row[0]
-            company_ceo_name_list.append(query)
-        else:
-            query = row[0]+'+'+row[1]
-            company_ceo_name_list.append(query)
-    cursor.close()
-    conn.close()
-
-    return company_ceo_name_list
-
-
 def crawling_articles_from_keyword(query, start_date, end_date, is_public):
     """뉴스기사 DB 저장"""
     # TOBE : Korean_all_code_info 에서 Korean_short_name+ceo_name 이 query로 들어가야함
@@ -61,8 +31,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             print ("5 seconds sleep...")
             time.sleep(5)
 
-        cf.send_message("KOR", "뉴스기사 DB 저장 success!")
-        print("뉴스기사 DB 저장 successfully.")
+        cf.send_message("KOR", f"{query} 뉴스기사 DB 저장 success!")
+        print(f"{query} 뉴스기사 DB 저장 successfully.")
         
     except Exception as e:
         cf.send_message("ERROR", f"뉴스기사 DB 저장 [오류 발생]{e}")
