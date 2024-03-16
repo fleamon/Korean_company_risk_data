@@ -27,7 +27,7 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         while current_datetime >= end_datetime:
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
-            naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
+            # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
             daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음') 
             print ("5 seconds sleep...")
             time.sleep(5)
@@ -196,6 +196,10 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
         page = page + 1
         print ("original_html status : ", original_html)
         html = BeautifulSoup(original_html.text, "html.parser")
+        # ul 태그 중 클래스가 "grid_xscroll"인 면 제거
+        grid_xscroll_elements = html.find_all("ul", class_="grid_xscroll")
+        for element in grid_xscroll_elements:
+            element.decompose()
         # 기사 관련 정보 크롤링
         # "strong" 태그의 "class" 속성이 "tit_item"인 요소 추출
         strong_tit_item = html.find_all("strong", class_="tit_item")
@@ -231,7 +235,12 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
         # "span" 태그의 "class" 속성이 "gem-subinfo"인 요소 추출
         div_item_contents = html.find_all("span", class_="gem-subinfo")
         for article_date in div_item_contents:
-            article_reg_date.append(article_date.text.strip().replace(".", "-"))
+            tmp_article_date_arr = article_date.text.strip().split()
+            if len(tmp_article_date_arr) > 1:
+                tmp_article_date = tmp_article_date_arr[0]
+            else:
+                tmp_article_date = article_date.text.strip()
+            article_reg_date.append(tmp_article_date.replace(".", "-"))
 
     if "+" in query:
         company_name = query.split("+")[0]
