@@ -26,8 +26,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         while current_datetime >= end_datetime:
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
-            # naver_news_crawler(maxpage, query, sort, crawling_date_id, '네이버') 
-            daum_news_crawler(maxpage, query, sort, crawling_date_id, '다음') 
+            naver_news_crawler(maxpage, query, sort, crawling_date_id, '네이버') 
+            # daum_news_crawler(maxpage, query, sort, crawling_date_id, '다음') 
             print ("5 seconds sleep...")
             time.sleep(5)
 
@@ -117,11 +117,16 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
         
     for remove_url in to_remove_url:
         article_link.remove(remove_url)
+    
+    if "+" in query:
+        company_name = query.split("+")[0]
+    else:
+        company_name = query
 
     result= {
             "article_reg_date" : article_reg_date
             , "article_link": article_link
-            , "company_name": query.split("+")[0]
+            , "company_name": company_name
             , "news_agency" : news_agency
             , "titles" : titles
             , "article_text": article_text
@@ -143,7 +148,7 @@ def naver_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
             WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
             AND search_keyword = '{query}'
             AND portal_name = '{portal_name}'
-            AND company_name = '{query.split("+")[0]}'
+            AND company_name = '{company_name}'
     '''
     cursor.execute(delete_query)
 
@@ -245,11 +250,16 @@ def daum_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
         
     for remove_url in to_remove_url:
         article_link.remove(remove_url)
+    
+    if "+" in query:
+        company_name = query.split("+")[0]
+    else:
+        company_name = query
 
     result= {
             "article_reg_date" : article_reg_date
             , "article_link": article_link
-            , "company_name": query.split("+")[0]
+            , "company_name": company_name
             , "news_agency" : news_agency
             , "titles" : titles
             , "article_text": article_text
@@ -271,7 +281,7 @@ def daum_news_crawler(maxpage, query, sort, crawling_date_id, portal_name):
             WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
             AND search_keyword = '{query}'
             AND portal_name = '{portal_name}'
-            AND company_name = '{query.split("+")[0]}'
+            AND company_name = '{company_name}'
     '''
     cursor.execute(delete_query)
 

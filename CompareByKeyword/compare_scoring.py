@@ -8,10 +8,10 @@ from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances, man
 
 def main():
     # 해당 일과 기업
-    impact_date = pd.to_datetime('2020-06-09', format='%Y-%m-%d').date()
+    impact_date = pd.to_datetime('2023-10-20', format='%Y-%m-%d').date()
     # print ("impact_date")
     # print (impact_date)
-    impact_firm = '삼성전자'
+    impact_firm = '카카오'
     # print ("impact_firm")
     # print (impact_firm)
     

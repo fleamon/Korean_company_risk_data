@@ -20,13 +20,16 @@ def DailyMain():
     '''
 
     # 뉴스기사 crawling (네이버, 다음)
-    company_ceo_name_list = cf.get_company_ceo_name()
-    company_ceo_name_list = company_ceo_name_list[0:50]  # test
+    # company_ceo_name_list = cf.get_company_ceo_name()
+    # company_ceo_name_list = company_ceo_name_list[0:50]  # test
+    # company_ceo_name_list = ['카카오+김범수']
+    company_ceo_name_list = ['삼성전자+이재용']
     for company_ceo_name in company_ceo_name_list:
-        # start_date = "2022.07.02"
-        # end_date = "2022.07.01"
+        start_date = "2024.03.10"
+        end_date = "2020.01.01"
         is_public = True
-        crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
+        # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
+        crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
     '''
     # bert 스코어링 결과 저장
