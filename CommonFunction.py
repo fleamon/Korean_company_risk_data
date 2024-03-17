@@ -177,6 +177,56 @@ def get_company_ceo_name():
     return company_ceo_name_list
 
 
+def result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name):
+    if "+" in query:
+        company_name = query.split("+")[0]
+    else:
+        company_name = query
+
+    result= {
+            "article_reg_date" : article_reg_date
+            , "article_link": article_link
+            , "company_name": company_name
+            , "news_agency" : news_agency
+            , "titles" : titles
+            , "article_text": article_text
+            }
+    df = pd.DataFrame(result)  # df로 변환
+    df = df.drop_duplicates()
+
+    # DB에 delete - insert
+    conn = connect_to_db()
+    cursor = conn.cursor()
+
+    delete_query = f'''
+        DELETE FROM stock_Korean_by_ESG_BackData.articles
+            WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
+            AND search_keyword = '{query}'
+            AND portal_name = '{portal_name}'
+            AND company_name = '{company_name}'
+    '''
+    cursor.execute(delete_query)
+
+    for index, row in df.iterrows():
+        insert_query = f'''
+            INSERT INTO stock_Korean_by_ESG_BackData.articles 
+            (article_reg_date, portal_name, article_link, company_name, news_agency, search_keyword, title, article_text, load_date)
+            VALUES 
+            ('{row["article_reg_date"]}', '{portal_name}', '{row["article_link"]}'
+            , '{row["company_name"]}', '{row["news_agency"]}', '{query}'
+            , '{row["titles"]}', '{row["article_text"]}', NOW())
+            ON DUPLICATE KEY UPDATE 
+            article_link=VALUES(article_link), 
+            title=VALUES(title), 
+            article_text=VALUES(article_text)
+        '''
+        cursor.execute(insert_query)
+        
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
 def send_message(market, msg):
     """디스코드 메세지 전송"""
     now = datetime.now()

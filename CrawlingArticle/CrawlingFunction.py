@@ -36,7 +36,7 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         while current_datetime >= end_datetime:
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
-            # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
+            naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
             daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음') 
             print ("5 seconds sleep...")
             time.sleep(5)
@@ -118,7 +118,7 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
     for remove_url in to_remove_url:
         article_link.remove(remove_url)
 
-    result_delete_insert_to_db(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+    cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
 
 
 def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
@@ -181,54 +181,4 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
                 tmp_article_date = article_date.text.strip()
             article_reg_date.append(tmp_article_date.replace(".", "-"))
 
-    result_delete_insert_to_db(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
-
-
-def result_delete_insert_to_db(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name):
-    if "+" in query:
-        company_name = query.split("+")[0]
-    else:
-        company_name = query
-
-    result= {
-            "article_reg_date" : article_reg_date
-            , "article_link": article_link
-            , "company_name": company_name
-            , "news_agency" : news_agency
-            , "titles" : titles
-            , "article_text": article_text
-            }
-    df = pd.DataFrame(result)  # df로 변환
-    df = df.drop_duplicates()
-
-    # DB에 delete - insert
-    conn = cf.connect_to_db()
-    cursor = conn.cursor()
-
-    delete_query = f'''
-        DELETE FROM stock_Korean_by_ESG_BackData.articles
-            WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
-            AND search_keyword = '{query}'
-            AND portal_name = '{portal_name}'
-            AND company_name = '{company_name}'
-    '''
-    cursor.execute(delete_query)
-
-    for index, row in df.iterrows():
-        insert_query = f'''
-            INSERT INTO stock_Korean_by_ESG_BackData.articles 
-            (article_reg_date, portal_name, article_link, company_name, news_agency, search_keyword, title, article_text, load_date)
-            VALUES 
-            ('{row["article_reg_date"]}', '{portal_name}', '{row["article_link"]}'
-            , '{row["company_name"]}', '{row["news_agency"]}', '{query}'
-            , '{row["titles"]}', '{row["article_text"]}', NOW())
-            ON DUPLICATE KEY UPDATE 
-            article_link=VALUES(article_link), 
-            title=VALUES(title), 
-            article_text=VALUES(article_text)
-        '''
-        cursor.execute(insert_query)
-        
-    conn.commit()
-    cursor.close()
-    conn.close()
+    cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
