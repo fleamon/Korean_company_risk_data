@@ -8,6 +8,15 @@ import re
 import CommonFunction as cf
 
 
+# html태그제거 및 텍스트 다듬기
+pattern1 = '<[^>]*>'
+pattern2 = '"'
+pattern3 = "'"
+pattern4 = '\t'
+pattern5 = '[^\w\s]'  # 이모지 패턴
+patterns = [pattern1, pattern2, pattern3, pattern4, pattern5]
+
+
 def crawling_articles_from_keyword(query, start_date, end_date, is_public):
     """뉴스기사 DB 저장"""
     # TOBE : Korean_all_code_info 에서 Korean_short_name+ceo_name 이 query로 들어가야함
@@ -97,80 +106,19 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
             article = naver_html.select("#articeBody")
         article = ''.join(str(article))
         
-        # html태그제거 및 텍스트 다듬기
-        pattern1 = '<[^>]*>'
-        pattern2 = '"'
-        pattern3 = "'"
-        pattern4 = '\t'
+        for pattern in patterns:
+            title = re.sub(pattern=pattern, repl='', string=str(title))
 
-        title = re.sub(pattern=pattern1, repl='', string=str(title))
-        title = re.sub(pattern=pattern2, repl='', string=str(title))
-        title = re.sub(pattern=pattern3, repl='', string=str(title))
-        title = re.sub(pattern=pattern4, repl='', string=str(title))
-        
-        article = re.sub(pattern=pattern1, repl='', string=article)
-        article = re.sub(pattern=pattern2, repl='', string=article)
-        article = re.sub(pattern=pattern3, repl='', string=article)
-        article = re.sub(pattern=pattern4, repl='', string=article)
+        for pattern in patterns:
+            article = re.sub(pattern=pattern, repl='', string=str(article))
         
         titles.append(title)
         article_text.append(article)
         
     for remove_url in to_remove_url:
         article_link.remove(remove_url)
-    
-    if "+" in query:
-        company_name = query.split("+")[0]
-    else:
-        company_name = query
 
-    result= {
-            "article_reg_date" : article_reg_date
-            , "article_link": article_link
-            , "company_name": company_name
-            , "news_agency" : news_agency
-            , "titles" : titles
-            , "article_text": article_text
-            }
-    df = pd.DataFrame(result)  # df로 변환
-    df = df.drop_duplicates()
-
-    # # 새로 만들 파일이름 지정
-    # now = datetime.now()  # 파일이름 현 시간으로 저장하기
-    # outputFileName = f'articles_from_naver_{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}_{now.second}.xlsx'
-    # df.to_excel('/Users/kakao/Downloads/'+outputFileName,sheet_name='sheet1')
-    
-    # DB에 delete - insert
-    conn = cf.connect_to_db()
-    cursor = conn.cursor()
-
-    delete_query = f'''
-        DELETE FROM stock_Korean_by_ESG_BackData.articles
-            WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
-            AND search_keyword = '{query}'
-            AND portal_name = '{portal_name}'
-            AND company_name = '{company_name}'
-    '''
-    cursor.execute(delete_query)
-
-    for index, row in df.iterrows():
-        insert_query = f'''
-            INSERT INTO stock_Korean_by_ESG_BackData.articles 
-            (article_reg_date, portal_name, article_link, company_name, news_agency, search_keyword, title, article_text, load_date)
-            VALUES 
-            ('{row["article_reg_date"]}', '{portal_name}', '{row["article_link"]}'
-            , '{row["company_name"]}', '{row["news_agency"]}', '{query}'
-            , '{row["titles"]}', '{row["article_text"]}', NOW())
-            ON DUPLICATE KEY UPDATE 
-            article_link=VALUES(article_link), 
-            title=VALUES(title), 
-            article_text=VALUES(article_text)
-        '''
-        cursor.execute(insert_query)
-        
-    conn.commit()
-    cursor.close()
-    conn.close()
+    result_delete_insert_to_db(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
 
 
 def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
@@ -183,11 +131,6 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
     result={}
     date_id = crawling_date_id.replace(".","")
     page = 1
-    # html태그제거 및 텍스트 다듬기
-    pattern1 = '<[^>]*>'
-    pattern2 = '"'
-    pattern3 = "'"
-    pattern4 = '\t'
     
     while page <= int(maxpage):
         url = 'https://search.daum.net/search?w=news&nil_search=btn&DA=PGD&enc=utf8&cluster=y&cluster_page=1&q=' + query + '&sd=' + date_id + '000000&ed=' + date_id + '235959&period=u&p=' + str(page) + '&sort=' + daum_sort
@@ -210,10 +153,8 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
         div_item_title = html.find_all("div", class_="item-title")
         for article_title in div_item_title:
             title = article_title.text.strip()
-            title = re.sub(pattern=pattern1, repl='', string=str(title))
-            title = re.sub(pattern=pattern2, repl='', string=str(title))
-            title = re.sub(pattern=pattern3, repl='', string=str(title))
-            title = re.sub(pattern=pattern4, repl='', string=str(title))
+            for pattern in patterns:
+                title = re.sub(pattern=pattern, repl='', string=str(title))
             titles.append(title)
             article_link.append(article_title.find("a")['href'])
             # 기사 내용 크롤링
@@ -227,10 +168,8 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
             article = ''
             for p in paragraphs:
                 article = article + p.get_text().strip()
-            article = re.sub(pattern=pattern1, repl='', string=article)
-            article = re.sub(pattern=pattern2, repl='', string=article)
-            article = re.sub(pattern=pattern3, repl='', string=article)
-            article = re.sub(pattern=pattern4, repl='', string=article)
+            for pattern in patterns:
+                article = re.sub(pattern=pattern, repl='', string=str(article))
             article_text.append(article)
         # "span" 태그의 "class" 속성이 "gem-subinfo"인 요소 추출
         div_item_contents = html.find_all("span", class_="gem-subinfo")
@@ -242,6 +181,10 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
                 tmp_article_date = article_date.text.strip()
             article_reg_date.append(tmp_article_date.replace(".", "-"))
 
+    result_delete_insert_to_db(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+
+
+def result_delete_insert_to_db(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name):
     if "+" in query:
         company_name = query.split("+")[0]
     else:
