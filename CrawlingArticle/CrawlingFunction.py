@@ -13,7 +13,7 @@ pattern1 = '<[^>]*>'
 pattern2 = '"'
 pattern3 = "'"
 pattern4 = '\t'
-pattern5 = '[^\w\s]'  # 이모지 패턴
+pattern5 = r'[^\w\s]'  # 이모지 패턴
 patterns = [pattern1, pattern2, pattern3, pattern4, pattern5]
 
 
