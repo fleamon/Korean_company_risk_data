@@ -6,6 +6,7 @@ import time
 import pandas as pd
 import pymysql
 from pytz import timezone
+import re
 
 
 path = os.getcwd()
@@ -225,6 +226,20 @@ def result_delete_insert_to_db_articles_table(query, article_reg_date, article_l
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def delete_patterns(value):
+    # html태그제거 및 텍스트 다듬기
+    pattern1 = '<[^>]*>'
+    pattern2 = '"'
+    pattern3 = "'"
+    pattern4 = '\t'
+    pattern5 = r'[^\w\s]'  # 이모지 패턴
+    patterns = [pattern1, pattern2, pattern3, pattern4, pattern5]
+    for pattern in patterns:
+        value = re.sub(pattern=pattern, repl='', string=str(value))
+    
+    return value
 
 
 def send_message(market, msg):

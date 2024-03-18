@@ -8,6 +8,7 @@ import CrawlingArticle.CrawlingFunction as crawl
 import ScoringByBert.bert_scoring as bert_scoring
 import ScoringByKeyword.keyword_scoring as keyword_scoring
 import CompareByKeyword.compare_scoring as compare_scoring
+import SummarizeArticles.summaize_articles as summaize_articles
 
 
 def DailyMain():
@@ -24,7 +25,7 @@ def DailyMain():
     # company_ceo_name_list = company_ceo_name_list[0:50]  # test
     company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용']
     for company_ceo_name in company_ceo_name_list:
-        start_date = "2024.03.17"
+        start_date = "2024.03.16"
         end_date = "2024.03.10"
         is_public = True
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
@@ -40,6 +41,9 @@ def DailyMain():
     # 키워드비교 스코어링
     compare_scoring.main()
     '''
+
+    # 특정날짜 기사들 한줄요약
+    summaize_articles.main()
 
 
 if __name__ == '__main__':

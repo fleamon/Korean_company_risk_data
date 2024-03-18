@@ -1,20 +1,8 @@
 import requests
 from datetime import datetime, timedelta
 import time
-import pandas as pd
-from pytz import timezone
 from bs4 import BeautifulSoup
-import re
 import CommonFunction as cf
-
-
-# html태그제거 및 텍스트 다듬기
-pattern1 = '<[^>]*>'
-pattern2 = '"'
-pattern3 = "'"
-pattern4 = '\t'
-pattern5 = r'[^\w\s]'  # 이모지 패턴
-patterns = [pattern1, pattern2, pattern3, pattern4, pattern5]
 
 
 def crawling_articles_from_keyword(query, start_date, end_date, is_public):
@@ -106,11 +94,8 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
             article = naver_html.select("#articeBody")
         article = ''.join(str(article))
         
-        for pattern in patterns:
-            title = re.sub(pattern=pattern, repl='', string=str(title))
-
-        for pattern in patterns:
-            article = re.sub(pattern=pattern, repl='', string=str(article))
+        title = cf.delete_patterns(title)
+        article = cf.delete_patterns(article)
         
         titles.append(title)
         article_text.append(article)
@@ -152,9 +137,7 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
         # "div" 태그의 "class" 속성이 "item-title"인 요소 추출
         div_item_title = html.find_all("div", class_="item-title")
         for article_title in div_item_title:
-            title = article_title.text.strip()
-            for pattern in patterns:
-                title = re.sub(pattern=pattern, repl='', string=str(title))
+            title = cf.delete_patterns(article_title.text.strip())
             titles.append(title)
             article_link.append(article_title.find("a")['href'])
             # 기사 내용 크롤링
@@ -168,8 +151,7 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
             article = ''
             for p in paragraphs:
                 article = article + p.get_text().strip()
-            for pattern in patterns:
-                article = re.sub(pattern=pattern, repl='', string=str(article))
+            article = cf.delete_patterns(article)
             article_text.append(article)
         # "span" 태그의 "class" 속성이 "gem-subinfo"인 요소 추출
         div_item_contents = html.find_all("span", class_="gem-subinfo")
