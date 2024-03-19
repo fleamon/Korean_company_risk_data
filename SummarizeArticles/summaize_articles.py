@@ -54,7 +54,7 @@ def main():
         #n = 3
     )
 
-    print (response['generations'][0]['text'])
+    # print (response['generations'][0]['text'])  # 한줄요약 확인
     articles_summary = cf.delete_patterns(response['generations'][0]['text'])
 
     conn = cf.connect_to_db()
