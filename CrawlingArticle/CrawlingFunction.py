@@ -66,17 +66,19 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
         page = page + 10
     
     to_remove_url = []
-    
     for naver_url in article_link:
         naver_original_html = requests.get(naver_url, headers=cf.headers)
         print ("naver_original_html status : ", naver_original_html)
         naver_html = BeautifulSoup(naver_original_html.text, "html.parser")
 
+        # 언론사
+        if naver_html.select_one('meta:nth-child(10)') is None:
+            to_remove_url.append(naver_url)
+            continue
+        news_agency.append(naver_html.select_one('meta:nth-child(10)').get("content"))
+
         # 기사 발행일
         article_reg_date.append(crawling_date_id.replace(".","-"))
-
-        # 언론사
-        news_agency.append( naver_html.select_one('meta:nth-child(10)').get("content") )
 
         # 뉴스 제목
         title = naver_html.select_one("#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
