@@ -25,8 +25,8 @@ def DailyMain():
     # company_ceo_name_list = company_ceo_name_list[0:50]  # test
     company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용']
     for company_ceo_name in company_ceo_name_list:
-        start_date = "2024.03.16"
-        end_date = "2024.03.10"
+        start_date = "2024.03.19"
+        end_date = "2024.03.15"
         is_public = True
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
         crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)

@@ -73,12 +73,7 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
         naver_html = BeautifulSoup(naver_original_html.text, "html.parser")
 
         # 기사 발행일
-        html_date = naver_html.select_one("div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span")
-        if html_date is None:
-            to_remove_url.append(naver_url)
-            continue
-        news_date = html_date.attrs['data-date-time']
-        article_reg_date.append(news_date)
+        article_reg_date.append(crawling_date_id.replace(".","-"))
 
         # 언론사
         news_agency.append( naver_html.select_one('meta:nth-child(10)').get("content") )
@@ -153,14 +148,6 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
                 article = article + p.get_text().strip()
             article = cf.delete_patterns(article)
             article_text.append(article)
-        # "span" 태그의 "class" 속성이 "gem-subinfo"인 요소 추출
-        div_item_contents = html.find_all("span", class_="gem-subinfo")
-        for article_date in div_item_contents:
-            tmp_article_date_arr = article_date.text.strip().split()
-            if len(tmp_article_date_arr) > 1:
-                tmp_article_date = tmp_article_date_arr[0]
-            else:
-                tmp_article_date = article_date.text.strip()
-            article_reg_date.append(tmp_article_date.replace(".", "-"))
+            article_reg_date.append(crawling_date_id.replace(".", "-"))
 
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
