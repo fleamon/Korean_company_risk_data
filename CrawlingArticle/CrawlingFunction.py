@@ -26,8 +26,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             current_datetime -= timedelta(days=1)
             naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
             daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음') 
-            print ("5 seconds sleep...")
-            time.sleep(5)
+            print ("1 seconds sleep...")
+            time.sleep(1)
 
         cf.send_message("KOR", f"{query} 뉴스기사 DB 저장 success!")
         print(f"{query} 뉴스기사 DB 저장 successfully.")
