@@ -40,10 +40,10 @@ def DailyMain():
     
     # 키워드비교 스코어링
     compare_scoring.main()
-    '''
 
     # 특정날짜 기사들 한줄요약
     summaize_articles.main()
+    '''
 
 
 if __name__ == '__main__':
