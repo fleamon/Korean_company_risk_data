@@ -25,12 +25,15 @@ def DailyMain():
     # company_ceo_name_list = company_ceo_name_list[0:50]  # test
     company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용']
     for company_ceo_name in company_ceo_name_list:
-        start_date = "2019.12.31"
+        start_date = "2019.09.01"
         end_date = "2010.01.01"
         is_public = True
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
         crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
-
+        # 특정날짜 특정기업 기사 한줄요약
+        # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # summaize_articles.main(company_ceo_name, start_date, end_date)
+    
     '''
     # bert 스코어링 결과 저장
     bert_scoring.main()
@@ -40,9 +43,6 @@ def DailyMain():
     
     # 키워드비교 스코어링
     compare_scoring.main()
-
-    # 특정날짜 기사들 한줄요약
-    summaize_articles.main()
     '''
 
 
