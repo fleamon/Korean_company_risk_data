@@ -125,25 +125,24 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
         grid_xscroll_elements = html.find_all("ul", class_="grid_xscroll")
         for element in grid_xscroll_elements:
             element.decompose()
-        # 기사 관련 정보 크롤링
-        # "strong" 태그의 "class" 속성이 "tit_item"인 요소 추출
-        strong_tit_item = html.find_all("strong", class_="tit_item")
-        for title in strong_tit_item:
-            if title.get('title'):
-                news_agency.append(title.text.strip())
-        # "div" 태그의 "class" 속성이 "item-title"인 요소 추출
+        # "div" 태그의 "class" 속성이 "item-title"인 요소 추출 (link 추출)
         div_item_title = html.find_all("div", class_="item-title")
         for article_title in div_item_title:
-            title = cf.delete_patterns(article_title.text.strip())
-            titles.append(title)
-            article_link.append(article_title.find("a")['href'])
             # 기사 내용 크롤링
             daum_original_html = requests.get(article_title.find("a")['href'], headers=cf.headers)
+            if daum_original_html.status_code != 200:
+                continue
             print ("daum_original_html status : ", daum_original_html)
+            title = cf.delete_patterns(article_title.text.strip())
+            titles.append(title)  # 기사제목 추출
+            article_link.append(article_title.find("a")['href'])  # 기사링크 추출
             daum_html = BeautifulSoup(daum_original_html.text, "html.parser")
-            # "span" 태그의 "class" 속성이 "gem-subinfo"인 요소 추출
+            # "h1" 태그의 "class" 속성이 "doc-title"인 요소 추출 (언론사 추출)
+            h1_class = daum_html.find("h1", class_="doc-title")
+            news_agency.append(h1_class.get_text().strip())
+            
+            # "span" 태그의 "class" 속성이 "gem-subinfo"인 요소 추출 (기사내용 추출)
             div_article_view = daum_html.find("div", class_="article_view")
-            # print (div_article_view)
             paragraphs = div_article_view.find_all('p')
             article = ''
             for p in paragraphs:
