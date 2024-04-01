@@ -7,7 +7,7 @@ import CommonFunction as cf
 import CrawlingArticle.CrawlingFunction as crawl
 import ScoringByBert.bert_scoring as bert_scoring
 import ScoringByKeyword.keyword_scoring as keyword_scoring
-import CompareByKeyword.compare_scoring as compare_scoring
+import CompareByKeyword.compared_articles as compared_articles
 import SummarizeArticles.summaize_articles as summaize_articles
 
 
@@ -33,9 +33,9 @@ def DailyMain():
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
         # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
-        # # 키워드비교 스코어링
-        # # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        # compare_scoring.main(company_ceo_name, start_date, end_date)
+        # 키워드비교 스코어링
+        # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        compared_articles.main(company_ceo_name, start_date, end_date)
 
         # # 특정날짜 특정기업 기사 한줄요약
         # # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
@@ -44,9 +44,10 @@ def DailyMain():
     '''
     # bert 스코어링 결과 저장 (param 필요없음(dill file))
     bert_scoring.main()
-    '''
+    
     # keyword로 스코어링 결과 저장 (param 필요없음(dill file))
     keyword_scoring.main()
+    '''
 
 
 if __name__ == '__main__':
