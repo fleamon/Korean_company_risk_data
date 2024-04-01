@@ -26,24 +26,28 @@ def DailyMain():
     company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용', '현대자동차+정의선', 'LG+구광모', 'SK+최태원']
     for company_ceo_name in company_ceo_name_list:
         start_date = "2024.03.27"
-        end_date = "2024.03.20"
+        end_date = "2010.01.01"
         is_public = True
+
+        # article crawling
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
-        crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
+        # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
+
+        # bert 스코어링 결과 저장
+        # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        bert_scoring.main(company_ceo_name, start_date, end_date)
+
+        # keyword로 스코어링
+        # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        keyword_scoring.main(company_ceo_name, start_date, end_date)
+
+        # 키워드비교 스코어링
+        # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        compare_scoring.main(company_ceo_name, start_date, end_date)
+
         # 특정날짜 특정기업 기사 한줄요약
         # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # summaize_articles.main(company_ceo_name, start_date, end_date)
-    
-    '''
-    # bert 스코어링 결과 저장
-    bert_scoring.main()
-    
-    # keyword로 스코어링
-    keyword_scoring.main()
-    
-    # 키워드비교 스코어링
-    compare_scoring.main()
-    '''
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ def main():
     # impact_firm = '카카오'
     impact_firm = '삼성전자'
     
-    with open('./dill_files/20240215_0038_score_dataframes.dill', 'rb') as f:
+    with open('./dill_files/score_dataframes.dill', 'rb') as f:
         data = dill.load(f)
 
     tfidf_vectorizer = TfidfVectorizer()

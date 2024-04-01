@@ -46,7 +46,7 @@ def main(company_ceo_name, start_date, end_date):
         impact_date = str(current_datetime.strftime("%Y-%m-%d"))
         current_datetime -= timedelta(days=1)
 
-        with open('./dill_files/20240215_0038_score_dataframes.dill', 'rb') as f:
+        with open('./dill_files/score_dataframes.dill', 'rb') as f:
             data = dill.load(f)
 
         # KoGPT에게 전달할 명령어 구성

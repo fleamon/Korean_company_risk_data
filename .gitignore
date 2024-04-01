@@ -1,6 +1,10 @@
 __pycache__/
 *.log
 
+# file
+*.csv
+*.dill
+
 # Environments
 .env
 .venv
