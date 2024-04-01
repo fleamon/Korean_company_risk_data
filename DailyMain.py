@@ -33,10 +33,6 @@ def DailyMain():
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
         # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
-        # keyword로 스코어링
-        # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        # keyword_scoring.main(company_ceo_name, start_date, end_date)
-
         # # 키워드비교 스코어링
         # # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # compare_scoring.main(company_ceo_name, start_date, end_date)
@@ -45,8 +41,13 @@ def DailyMain():
         # # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # summaize_articles.main(company_ceo_name, start_date, end_date)
 
+    '''
     # bert 스코어링 결과 저장 (param 필요없음(dill file))
     bert_scoring.main()
+    '''
+    # keyword로 스코어링 결과 저장 (param 필요없음(dill file))
+    keyword_scoring.main()
+
 
 if __name__ == '__main__':
     DailyMain()

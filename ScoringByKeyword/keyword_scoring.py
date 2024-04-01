@@ -2,7 +2,7 @@ import dill
 import pandas as pd
 import CommonFunction as cf
 
-def main(company_ceo_name, start_date, end_date):
+def main():
     with open('./dill_files/score_dataframes.dill', 'rb') as f:
         data = dill.load(f)
 
@@ -233,9 +233,6 @@ def main(company_ceo_name, start_date, end_date):
 
     conn = cf.connect_to_db()
     cursor = conn.cursor()
-    truncate_query = """TRUNCATE TABLE stock_Korean_by_ESG_BackData.articles_posi_nega_scoring"""
-    cursor.execute(truncate_query)
-    conn.commit()
     
     # MySQL 테이블 생성
     create_table_query = """
@@ -289,6 +286,13 @@ def main(company_ceo_name, start_date, end_date):
         # print (row.name)  # <class 'pandas._libs.tslibs.timestamps.Timestamp'>
         # print (row)  # type : <class 'pandas.core.series.Series'>
         # break
+        delete_query = f'''
+            DELETE FROM stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
+            WHERE date_id = '{str(row.name).split(' ')[0]}'
+        '''
+        cursor.execute(delete_query)
+        conn.commit()
+
         insert_query = f'''
             INSERT INTO stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
             (date_id, {merged_df_columns}, load_date)
