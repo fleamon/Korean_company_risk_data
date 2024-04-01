@@ -3,13 +3,7 @@ import CommonFunction as cf
 import pandas as pd
 
 
-def main():
-    conn = cf.connect_to_db()
-    cursor = conn.cursor()
-    truncate_query = """TRUNCATE TABLE stock_Korean_by_ESG_BackData.articles_bert_scoring"""
-    cursor.execute(truncate_query)
-    conn.commit()
-            
+def main(): 
     # dill 파일에서 데이터 읽기
     with open('./dill_files/score_dataframes.dill', 'rb') as f:
         data = dill.load(f)
@@ -27,12 +21,15 @@ def main():
     # print(daily_com_grouped_df_columns)  #type : <class 'str'>
 
     scores_df = pd.DataFrame()
-    scores_df['title_index'] = daily_com_grouped_df['title_positive_score'] -  daily_com_grouped_df['title_negative_score'] 
-    scores_df['article_index'] = daily_com_grouped_df['article_positive_score'] -  daily_com_grouped_df['article_negative_score']
+    scores_df['title_index'] = daily_com_grouped_df['title_positive_score'] - daily_com_grouped_df['title_negative_score'] 
+    scores_df['article_index'] = daily_com_grouped_df['article_positive_score'] - daily_com_grouped_df['article_negative_score']
     print (scores_df)  # type : <class 'pandas.core.frame.DataFrame'>
     scores_df_columns = ', '.join(scores_df.columns)
     print (scores_df_columns)  #type : <class 'str'>
 
+    conn = cf.connect_to_db()
+    cursor = conn.cursor()
+           
     # MySQL 테이블 생성
     create_table_query = """
     CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.articles_bert_scoring (
@@ -54,6 +51,14 @@ def main():
     for index, row in scores_df.iterrows():
         # print (row.name)  # (datetime.date(2020, 12, 7), '삼성전자')
         # print (row)  # type : <class 'pandas.core.series.Series'>
+        delete_query = f'''
+            DELETE FROM stock_Korean_by_ESG_BackData.articles_bert_scoring
+            WHERE date_id = '{row.name[0]}'
+              AND company_name = '{row.name[1]}'
+        '''
+        cursor.execute(delete_query)
+        conn.commit()
+
         insert_query = f'''
             INSERT INTO stock_Korean_by_ESG_BackData.articles_bert_scoring
             (date_id, company_name, {scores_df_columns}, load_date)

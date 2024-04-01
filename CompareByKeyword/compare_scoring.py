@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances, manhattan_distances
 
 
-def main():
+def main(company_ceo_name, start_date, end_date):
     # 해당 일과 기업
     # impact_date = pd.to_datetime('2023-10-20', format='%Y-%m-%d').date()
     impact_date = pd.to_datetime('2021-01-18', format='%Y-%m-%d').date()

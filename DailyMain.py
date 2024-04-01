@@ -33,22 +33,20 @@ def DailyMain():
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
         # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
-        # bert 스코어링 결과 저장
-        # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        bert_scoring.main(company_ceo_name, start_date, end_date)
-
         # keyword로 스코어링
         # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        keyword_scoring.main(company_ceo_name, start_date, end_date)
+        # keyword_scoring.main(company_ceo_name, start_date, end_date)
 
-        # 키워드비교 스코어링
-        # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        compare_scoring.main(company_ceo_name, start_date, end_date)
+        # # 키워드비교 스코어링
+        # # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # compare_scoring.main(company_ceo_name, start_date, end_date)
 
-        # 특정날짜 특정기업 기사 한줄요약
-        # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # # 특정날짜 특정기업 기사 한줄요약
+        # # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # summaize_articles.main(company_ceo_name, start_date, end_date)
 
+    # bert 스코어링 결과 저장 (param 필요없음(dill file))
+    bert_scoring.main()
 
 if __name__ == '__main__':
     DailyMain()
