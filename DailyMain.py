@@ -23,7 +23,8 @@ def DailyMain():
     # 뉴스기사 crawling (네이버, 다음)
     # company_ceo_name_list = cf.get_company_ceo_name()
     # company_ceo_name_list = company_ceo_name_list[0:50]  # test
-    company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용', '현대자동차+정의선', 'LG+구광모', 'SK+최태원']
+    # company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용', '현대자동차+정의선', 'LG+구광모', 'SK+최태원']
+    company_ceo_name_list = ['삼성전자+이재용']
     for company_ceo_name in company_ceo_name_list:
         start_date = "2024.03.27"
         end_date = "2024.03.27"

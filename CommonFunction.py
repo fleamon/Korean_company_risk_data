@@ -206,6 +206,7 @@ def result_delete_insert_to_db_articles_table(query, article_reg_date, article_l
             AND portal_name = '{portal_name}'
             AND company_name = '{company_name}'
     '''
+    # print (delete_query)
     cursor.execute(delete_query)
 
     for index, row in df.iterrows():
@@ -221,6 +222,7 @@ def result_delete_insert_to_db_articles_table(query, article_reg_date, article_l
             title=VALUES(title), 
             article_text=VALUES(article_text)
         '''
+        # print (insert_query)
         cursor.execute(insert_query)
         
     conn.commit()

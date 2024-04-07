@@ -13,6 +13,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
     # 상장회사는 Korean_all_code_info 매일 모두 크롤링, 비상장회사는 필요한 회사 받아오도록 수정
     print([time.strftime('%Y-%m-%d %H:%M:%S')], "!!!!! DEBUG PRINT : 뉴스기사 DB 저장 !!!!!")
     try:
+        dummypage = 1  # 사용하지 않는 변수
+        dummysort = 1  # 사용하지 않는 변수
         maxpage = "1"  # 검색어 넣은 마지막 페이지
         naver_sort = "0"  # 0:관련도순, 1:최신순, 2:오래된순
         daum_sort = "accuracy"  # accuracy:정확도순, recency:최신순, old:오래된순
@@ -24,8 +26,9 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         while current_datetime >= end_datetime:
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
-            naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
-            daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음') 
+            # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
+            # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음') 
+            dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드') 
             print ("5 seconds sleep...")
             time.sleep(5)
 
@@ -111,6 +114,7 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
     titles=[]
     article_text=[]
     result={}
+    
     date_id = crawling_date_id.replace(".","")
     page = 1
     
@@ -151,4 +155,67 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
             article_text.append(article)
             article_reg_date.append(crawling_date_id.replace(".", "-"))
 
+    cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+
+
+def dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
+    # 각 크롤링 결과 저장하기 위한 리스트 선언 
+    article_reg_date=[]
+    article_link=[]
+    news_agency=[]
+    titles=[]
+    article_text=[]
+    
+    if '+' in query:
+        func_query = query.replace('+', ' ')
+    url = 'https://search.dcinside.com/combine/q/' + func_query
+    print ("url :", url)
+    original_html = requests.get(url, headers=cf.headers)
+    print ("original_html status : ", original_html)
+    html = BeautifulSoup(original_html.text, "html.parser")
+    # dcinside news
+    ul_list = html.find_all("ul", class_="sch_result_list")
+    li_tags = ul_list[0].find_all('li')
+    for li_tag in li_tags:
+        date_time = li_tag.find('span', class_='date_time').text
+        if date_time.split(' ')[0] != crawling_date_id:
+            continue
+        else:
+            article_url = requests.get(li_tag.find("a")['href'], headers=cf.headers)
+            article_html = BeautifulSoup(article_url.text, "html.parser")
+            article_reg_date.append(crawling_date_id)
+            article_link.append(li_tag.find("a")['href'])
+            article_title = cf.delete_patterns(article_html.find('h1', class_='headline mg').text)
+            titles.append(article_title)
+            article_html_agency = article_html.find('div', class_='byline').find('em', class_='mg')
+            news_agency.append(article_html_agency.text[1:-1])
+            article_content = cf.delete_patterns(article_html.find('div', class_='article_body fs1 mg').text)
+            article_text.append(article_content)
+            
+    cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+
+    article_reg_date=[]
+    article_link=[]
+    news_agency=[]
+    titles=[]
+    article_text=[]
+    
+    # dcinside post
+    li_tags = ul_list[1].find_all('li')
+    for li_tag in li_tags:
+        date_time = li_tag.find('span', class_='date_time').text
+        if date_time.split(' ')[0] != crawling_date_id:
+            continue
+        else:
+            article_url = requests.get(li_tag.find("a")['href'], headers=cf.headers)
+            article_html = BeautifulSoup(article_url.text, "html.parser")
+            article_reg_date.append(crawling_date_id)
+            article_link.append(li_tag.find("a")['href'])
+            article_title = cf.delete_patterns(article_html.find('span', class_='title_subject').text.strip())
+            titles.append(article_title)
+            article_html_agency = article_html.find('div', class_='fl clear').text.strip()
+            news_agency.append(article_html_agency)
+            article_content = cf.delete_patterns(article_html.find('div', class_='write_div').text.strip())
+            article_text.append(article_content)
+            
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
