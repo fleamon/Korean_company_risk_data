@@ -37,6 +37,9 @@ def main(company_ceo_name, start_date, end_date):
         impact_firm = company_ceo_name.split('+')[0]
     else:
         impact_firm = company_ceo_name
+    
+    with open('./dill_files/score_dataframes.dill', 'rb') as f:
+        data = dill.load(f)
 
     start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
     end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
@@ -45,9 +48,6 @@ def main(company_ceo_name, start_date, end_date):
     while current_datetime >= end_datetime:
         impact_date = str(current_datetime.strftime("%Y-%m-%d"))
         current_datetime -= timedelta(days=1)
-
-        with open('./dill_files/score_dataframes.dill', 'rb') as f:
-            data = dill.load(f)
 
         # KoGPT에게 전달할 명령어 구성
         article_texts = ' '.join(data.query( "company_name == @impact_firm and article_reg_date == @impact_date ")['article_text'].replace(r'\n+', ' ', regex=True) )

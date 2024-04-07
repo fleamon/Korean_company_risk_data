@@ -10,11 +10,16 @@ def main(company_ceo_name, start_date, end_date):
     with open('./dill_files/score_dataframes.dill', 'rb') as f:
         data = dill.load(f)
 
+    print ("tfidf_vectorizer")
     tfidf_vectorizer = TfidfVectorizer()
+    print ("tfidf_matrix")
     tfidf_matrix = tfidf_vectorizer.fit_transform(data['article_text'])
     
+    print ("cosine_similarities")
     cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix)
+    print ("euclidean_distances_matrix")
     euclidean_distances_matrix = euclidean_distances(tfidf_matrix, tfidf_matrix)
+    print ("manhattan_distances_matrix")
     manhattan_distances_matrix = manhattan_distances(tfidf_matrix, tfidf_matrix)
     
     cosine_sim_df = pd.DataFrame(cosine_similarities,  
