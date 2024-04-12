@@ -230,56 +230,28 @@ def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, port
     titles=[]
     article_text=[]
     
-    if '+' in query:
-        func_query = query.replace('+', ' ')
-    url = 'https://search.dcinside.com/combine/q/' + func_query
+    url = 'https://www.fmkorea.com/search.php?act=IS&is_keyword=' + query
+    crawling_date_id = crawling_date_id.replace('.', '-');
     print ("url :", url)
     original_html = requests.get(url, headers=cf.headers)
     print ("original_html status : ", original_html)
     html = BeautifulSoup(original_html.text, "html.parser")
-    # dcinside news
-    ul_list = html.find_all("ul", class_="sch_result_list")
+    # 통합검색
+    ul_list = html.find_all("ul", class_="searchResult")
     li_tags = ul_list[0].find_all('li')
     for li_tag in li_tags:
-        date_time = li_tag.find('span', class_='date_time').text
+        date_time = li_tag.find('span', class_='time').text
         if date_time.split(' ')[0] != crawling_date_id:
             continue
         else:
-            article_url = requests.get(li_tag.find("a")['href'], headers=cf.headers)
+            article_url = requests.get("https://www.fmkorea.com" + li_tag.find("a")['href'], headers=cf.headers)
             article_html = BeautifulSoup(article_url.text, "html.parser")
             article_reg_date.append(crawling_date_id)
-            article_link.append(li_tag.find("a")['href'])
-            article_title = cf.delete_patterns(article_html.find('h1', class_='headline mg').text)
+            article_link.append("https://www.fmkorea.com" + li_tag.find("a")['href'])
+            article_title = cf.delete_patterns(article_html.find('span', class_='np_18px_span').text)
             titles.append(article_title)
-            article_html_agency = article_html.find('div', class_='byline').find('em', class_='mg')
-            news_agency.append(article_html_agency.text[1:-1])
-            article_content = cf.delete_patterns(article_html.find('div', class_='article_body fs1 mg').text)
-            article_text.append(article_content)
-            
-    cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
-
-    article_reg_date=[]
-    article_link=[]
-    news_agency=[]
-    titles=[]
-    article_text=[]
-    
-    # dcinside post
-    li_tags = ul_list[1].find_all('li')
-    for li_tag in li_tags:
-        date_time = li_tag.find('span', class_='date_time').text
-        if date_time.split(' ')[0] != crawling_date_id:
-            continue
-        else:
-            article_url = requests.get(li_tag.find("a")['href'], headers=cf.headers)
-            article_html = BeautifulSoup(article_url.text, "html.parser")
-            article_reg_date.append(crawling_date_id)
-            article_link.append(li_tag.find("a")['href'])
-            article_title = cf.delete_patterns(article_html.find('span', class_='title_subject').text.strip())
-            titles.append(article_title)
-            article_html_agency = article_html.find('div', class_='fl clear').text.strip()
-            news_agency.append(article_html_agency)
-            article_content = cf.delete_patterns(article_html.find('div', class_='write_div').text.strip())
+            news_agency.append(portal_name)
+            article_content = cf.delete_patterns(article_html.find('div', class_='rd_body clear').text)
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
