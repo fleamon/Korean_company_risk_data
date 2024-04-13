@@ -26,8 +26,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         while current_datetime >= end_datetime:
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
-            # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
-            # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
+            naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
+            daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
             dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
             fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, '에펨코리아')
             clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, '클리앙')
@@ -44,6 +44,7 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
 
 def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name):
     # 각 크롤링 결과 저장하기 위한 리스트 선언 
+    print (f'crawling_date_id = {crawling_date_id}')
     article_reg_date=[]
     article_link=[]
     news_agency=[]
@@ -110,6 +111,7 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
 
 def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
     # 각 크롤링 결과 저장하기 위한 리스트 선언 
+    print (f'crawling_date_id = {crawling_date_id}')
     article_reg_date=[]
     article_link=[]
     news_agency=[]
@@ -162,6 +164,7 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
 
 def dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
     # 각 크롤링 결과 저장하기 위한 리스트 선언 
+    print (f'crawling_date_id = {crawling_date_id}')
     article_reg_date=[]
     article_link=[]
     news_agency=[]
@@ -225,6 +228,7 @@ def dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, por
 
 def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
     # 각 크롤링 결과 저장하기 위한 리스트 선언 
+    print (f'crawling_date_id = {crawling_date_id}')
     article_reg_date=[]
     article_link=[]
     news_agency=[]
@@ -260,6 +264,7 @@ def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, port
 
 def clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
     # 각 크롤링 결과 저장하기 위한 리스트 선언 
+    print (f'crawling_date_id = {crawling_date_id}')
     article_reg_date=[]
     article_link=[]
     news_agency=[]
