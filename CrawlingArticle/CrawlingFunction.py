@@ -29,7 +29,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버') 
             # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음') 
             # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드') 
-            fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, '에펨코리아') 
+            # fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, '에펨코리아') 
+            clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, '클리앙') 
             print ("5 seconds sleep...")
             time.sleep(5)
 
@@ -231,7 +232,7 @@ def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, port
     article_text=[]
     
     url = 'https://www.fmkorea.com/search.php?act=IS&is_keyword=' + query
-    crawling_date_id = crawling_date_id.replace('.', '-');
+    crawling_date_id = crawling_date_id.replace('.', '-')
     print ("url :", url)
     original_html = requests.get(url, headers=cf.headers)
     print ("original_html status : ", original_html)
@@ -252,6 +253,38 @@ def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, port
             titles.append(article_title)
             news_agency.append(portal_name)
             article_content = cf.delete_patterns(article_html.find('div', class_='rd_body clear').text)
+            article_text.append(article_content)
+            
+    cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+
+
+def clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
+    # 각 크롤링 결과 저장하기 위한 리스트 선언 
+    article_reg_date=[]
+    article_link=[]
+    news_agency=[]
+    titles=[]
+    article_text=[]
+    
+    url = 'https://www.clien.net/service/search?q=' + query
+    print ("url :", url)
+    original_html = requests.get(url, headers=cf.headers)
+    print ("original_html status : ", original_html)
+    html = BeautifulSoup(original_html.text, "html.parser")
+    # 통합검색
+    div_list = html.find_all("div", class_="list_item symph_row jirum")
+    for div_value in div_list:
+        if crawling_date_id.replace('.', '-') != div_value.find('span', class_='time popover').text[5:15]:
+            continue
+        else:
+            article_url = requests.get('https://www.clien.net' + div_value.find("a")['href'], headers=cf.headers)
+            article_html = BeautifulSoup(article_url.text, "html.parser")
+            article_reg_date.append(crawling_date_id.replace('.', '-'))
+            article_link.append('https://www.clien.net' + div_value.find("a")['href'])
+            article_title = cf.delete_patterns(article_html.find('h3', class_='post_subject').text)
+            titles.append(article_title)
+            news_agency.append(portal_name)
+            article_content = cf.delete_patterns(article_html.find('div', class_='post_content').text)
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)

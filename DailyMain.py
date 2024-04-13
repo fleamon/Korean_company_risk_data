@@ -29,6 +29,8 @@ def DailyMain():
         start_date = "2024.03.27"
         end_date = "2024.03.27"
         # end_date = "2010.01.01"
+        start_date = "2024.04.03"
+        end_date = "2024.04.03"
         is_public = True
 
         # article crawling
