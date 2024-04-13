@@ -26,11 +26,9 @@ def DailyMain():
     # company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용', '현대자동차+정의선', 'LG+구광모', 'SK+최태원']
     company_ceo_name_list = ['삼성전자+이재용']
     for company_ceo_name in company_ceo_name_list:
-        start_date = "2024.03.27"
-        end_date = "2024.03.27"
-        # end_date = "2010.01.01"
-        start_date = "2024.04.03"
-        end_date = "2024.04.03"
+        start_date = "2024.04.13"
+        # end_date = "2024.03.27"
+        end_date = "2010.01.01"
         is_public = True
 
         # article crawling
