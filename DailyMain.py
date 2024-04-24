@@ -43,13 +43,11 @@ def DailyMain():
         # # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # summaize_articles.main(company_ceo_name, start_date, end_date)
 
-    '''
     # bert 스코어링 결과 저장 (param 필요없음(dill file))
-    bert_scoring.main()
+    # bert_scoring.main()
     
     # keyword로 스코어링 결과 저장 (param 필요없음(dill file))
     keyword_scoring.main()
-    '''
 
 
 if __name__ == '__main__':

@@ -119,8 +119,8 @@ def main():
         # 정확하지 않은 일자.
     }
     
-
-    dataframes = []
+    pos_dataframes = []
+    neg_dataframes = []
     for target_company_name in compare_targets_dict.keys():
         print ("회사이름 : ", target_company_name)
     
@@ -203,81 +203,41 @@ def main():
         # 일별 스코어 최종 집계
         article_positive_scores_df = (0 - daily_grouped_scroes_df['article_positive_score']['sum'] * daily_grouped_scroes_df['article_positive_score']['count']).rolling(5).mean()
         article_negative_scores_df = (daily_grouped_scroes_df['article_negative_score']['sum'] * daily_grouped_scroes_df['article_negative_score']['count']).rolling(5).mean()
-        dataframes.append(article_positive_scores_df)
-        dataframes.append(article_negative_scores_df)
+        pos_dataframes.append(pd.melt(article_positive_scores_df.reset_index(), id_vars = ['article_reg_date']))
+        neg_dataframes.append(pd.melt(article_negative_scores_df.reset_index(), id_vars = ['article_reg_date']))
     
     # dataframe merge
-    merged_df = dataframes[0]
-    for df in dataframes[1:]:
-        merged_df = pd.merge(merged_df, df, on='article_reg_date', how='outer')
+    pos_df = pd.concat(pos_dataframes)
+    pos_df.columns = ["article_reg_date", "company_name", "positive_score"]
 
-    merged_df.columns = merged_df.columns.str.replace('_x', '_positive')
-    merged_df.columns = merged_df.columns.str.replace('_y', '_negative')
-    print(merged_df)
-    merged_df_columns = ', '.join(merged_df.columns)
-    print (merged_df_columns)
-    merged_df_columns = merged_df_columns.replace("삼성전자", "samsung")
-    merged_df_columns = merged_df_columns.replace("현대자동차", "hyundai")
-    merged_df_columns = merged_df_columns.replace("네이버", "naver")
-    merged_df_columns = merged_df_columns.replace("라인", "line")
-    merged_df_columns = merged_df_columns.replace("카카오", "kakao")
-    merged_df_columns = merged_df_columns.replace("쿠팡", "coupang")
-    merged_df_columns = merged_df_columns.replace("우버코리아", "uber")
-    merged_df_columns = merged_df_columns.replace("모빌리티", "mobility")
-    merged_df_columns = merged_df_columns.replace("페이", "pay")
-    merged_df_columns = merged_df_columns.replace("토스", "toss")
-    merged_df_columns = merged_df_columns.replace("배달의민족", "delivery")
-    merged_df_columns = merged_df_columns.replace("우아한형제들", "brothers")
-    merged_df_columns = merged_df_columns.replace("파이낸셜", "finance")
+    neg_df = pd.concat(neg_dataframes)
+    neg_df.columns = ["article_reg_date", "company_name", "negative_score"]
+
+    merged_df = pd.merge( pos_df, neg_df, on = [ "article_reg_date", "company_name"], how = "outer")
+
+    # merged_df = merged_df.replace("삼성전자", "samsung")
+    # merged_df = merged_df.replace("현대자동차", "hyundai")
+    # merged_df = merged_df.replace("네이버", "naver")
+    # merged_df = merged_df.replace("라인", "line")
+    # merged_df = merged_df.replace("카카오", "kakao")
+    # merged_df = merged_df.replace("쿠팡", "coupang")
+    # merged_df = merged_df.replace("우버코리아", "uber")
+    # merged_df = merged_df.replace("모빌리티", "mobility")
+    # merged_df = merged_df.replace("페이", "pay")
+    # merged_df = merged_df.replace("토스", "toss")
+    # merged_df = merged_df.replace("배달의민족", "delivery")
+    # merged_df = merged_df.replace("우아한형제들", "brothers")
+    # merged_df = merged_df.replace("파이낸셜", "finance")
+    merged_df.fillna('NULL', inplace=True)
+    print (merged_df)
+
+    merged_df_columns = ', '.join(merged_df.columns[1:])
     print (merged_df_columns)
 
     conn = cf.connect_to_db()
     cursor = conn.cursor()
     
     # MySQL 테이블 생성
-    # AS-IS
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.articles_posi_nega_scoring (
-    seq bigint NOT NULL AUTO_INCREMENT,
-    date_id date DEFAULT NULL COMMENT '날짜',
-    LG_positive double DEFAULT NULL COMMENT 'LG긍정Score',
-    SK_positive double DEFAULT NULL COMMENT 'SK긍정Score',
-    samsung_positive double DEFAULT NULL COMMENT '삼성긍정Score',
-    hyundai_positive double DEFAULT NULL COMMENT '현대긍정Score',
-    LG_negative double DEFAULT NULL COMMENT 'LG부정Score',
-    SK_negative double DEFAULT NULL COMMENT 'SK부정Score',
-    samsung_negative double DEFAULT NULL COMMENT '삼성부정Score',
-    hyundai_negative double DEFAULT NULL COMMENT '현대부정Score',
-    naver_positive double DEFAULT NULL COMMENT '네이버긍정Score',
-    line_positive double DEFAULT NULL COMMENT '라인긍정Score',
-    delivery_positive double DEFAULT NULL COMMENT '배민긍정Score',
-    brothers_positive double DEFAULT NULL COMMENT '우형긍정Score',
-    kakao_positive double DEFAULT NULL COMMENT '카카오긍정Score',
-    coupang_positive double DEFAULT NULL COMMENT '쿠팡긍정Score',
-    naver_negative double DEFAULT NULL COMMENT '네이버부정Score',
-    line_negative double DEFAULT NULL COMMENT '라인부정Score',
-    delivery_negative double DEFAULT NULL COMMENT '배민부정Score',
-    brothers_negative double DEFAULT NULL COMMENT '우형부정Score',
-    kakao_negative double DEFAULT NULL COMMENT '카카오부정Score',
-    coupang_negative double DEFAULT NULL COMMENT '쿠팡부정Score',
-    VCNC_positive double DEFAULT NULL COMMENT '타다긍정Score',
-    uber_positive double DEFAULT NULL COMMENT '우버긍정Score',
-    kakaomobility_positive double DEFAULT NULL COMMENT '카카오모빌리티긍정Score',
-    VCNC_negative double DEFAULT NULL COMMENT '타다부정Score',
-    uber_negative double DEFAULT NULL COMMENT '우버부정Score',
-    kakaomobility_negative double DEFAULT NULL COMMENT '카카오모빌리티부정Score',
-    naverfinance_positive double DEFAULT NULL COMMENT '네이버파이낸셜긍정Score',
-    kakaopay_positive double DEFAULT NULL COMMENT '카카오페이긍정Score',
-    toss_positive double DEFAULT NULL COMMENT '토스긍정Score',
-    naverfinance_negative double DEFAULT NULL COMMENT '네이버파이낸셜부정Score',
-    kakaopay_negative double DEFAULT NULL COMMENT '카카오페이부정Score',
-    toss_negative double DEFAULT NULL COMMENT '토스부정Score',
-    load_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '저장시간',
-    PRIMARY KEY (seq),
-    KEY idx_date_id (date_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-    """
-    # TO-BE
     create_table_query = """
     CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.articles_posi_nega_scoring (
     seq bigint NOT NULL AUTO_INCREMENT,
@@ -293,16 +253,17 @@ def main():
     cursor.execute(create_table_query)
     conn.commit()
 
-    # 결측치를 'NULL'로 대체
-    merged_df.fillna('NULL', inplace=True)
     # 데이터베이스에 데이터 삽입
     for index, row in merged_df.iterrows():
         # print (row.name)  # <class 'pandas._libs.tslibs.timestamps.Timestamp'>
         # print (row)  # type : <class 'pandas.core.series.Series'>
         # break
+        article_reg_date = str(row["article_reg_date"]).split(' ')[0]
+        company_name = str(row["company_name"])
         delete_query = f'''
             DELETE FROM stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
-            WHERE date_id = '{str(row.name).split(' ')[0]}'
+            WHERE date_id = '{article_reg_date}'
+            AND company_name = '{company_name}'
         '''
         cursor.execute(delete_query)
         conn.commit()
@@ -311,15 +272,10 @@ def main():
             INSERT INTO stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
             (date_id, {merged_df_columns}, load_date)
             VALUES
-            ('{str(row.name).split(' ')[0]}'
-            , {row["LG_positive"]}, {row["SK_positive"]}, {row["삼성전자_positive"]}, {row["현대자동차_positive"]}
-            , {row["LG_negative"]}, {row["SK_negative"]}, {row["삼성전자_negative"]}, {row["현대자동차_negative"]}
-            , {row["네이버_positive"]}, {row["라인_positive"]}, {row["배달의민족_positive"]}, {row["우아한형제들_positive"]}, {row["카카오_positive"]}, {row["쿠팡_positive"]}
-            , {row["네이버_negative"]}, {row["라인_negative"]}, {row["배달의민족_negative"]}, {row["우아한형제들_negative"]}, {row["카카오_negative"]}, {row["쿠팡_negative"]}
-            , {row["VCNC_positive"]}, {row["우버코리아_positive"]}, {row["카카오모빌리티_positive"]}
-            , {row["VCNC_negative"]}, {row["우버코리아_negative"]}, {row["카카오모빌리티_negative"]}
-            , {row["네이버파이낸셜_positive"]}, {row["카카오페이_positive"]}, {row["토스_positive"]}
-            , {row["네이버파이낸셜_negative"]}, {row["카카오페이_negative"]}, {row["토스_negative"]}
+            ('{article_reg_date}'
+            , '{row["company_name"]}'
+            , {row["positive_score"]}
+            , {row["negative_score"]}
             , NOW())
             ON DUPLICATE KEY UPDATE 
             date_id=VALUES(date_id)
