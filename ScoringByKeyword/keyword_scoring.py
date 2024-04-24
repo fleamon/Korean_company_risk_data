@@ -235,6 +235,7 @@ def main():
     cursor = conn.cursor()
     
     # MySQL 테이블 생성
+    # AS-IS
     create_table_query = """
     CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.articles_posi_nega_scoring (
     seq bigint NOT NULL AUTO_INCREMENT,
@@ -271,6 +272,19 @@ def main():
     naverfinance_negative double DEFAULT NULL COMMENT '네이버파이낸셜부정Score',
     kakaopay_negative double DEFAULT NULL COMMENT '카카오페이부정Score',
     toss_negative double DEFAULT NULL COMMENT '토스부정Score',
+    load_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '저장시간',
+    PRIMARY KEY (seq),
+    KEY idx_date_id (date_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """
+    # TO-BE
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.articles_posi_nega_scoring (
+    seq bigint NOT NULL AUTO_INCREMENT,
+    date_id date DEFAULT NULL COMMENT '날짜',
+    company_name varchar(255) DEFAULT NULL COMMENT '기업명',
+    positive_score double DEFAULT NULL COMMENT '긍정Score',
+    negative_score double DEFAULT NULL COMMENT '부정Score',
     load_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '저장시간',
     PRIMARY KEY (seq),
     KEY idx_date_id (date_id)
