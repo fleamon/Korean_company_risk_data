@@ -7,8 +7,8 @@ from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances, man
 
 def main(company_ceo_name, start_date, end_date):
     start_date = start_date.replace('.', '-')
-    end_date = end_date.replace('.', '-')
-    end_date = str(datetime.strptime(end_date, '%Y-%m-%d') - timedelta(days=365)).split()[0]
+    origin_end_date = end_date.replace('.', '-')
+    end_date = str(datetime.strptime(origin_end_date, '%Y-%m-%d') - timedelta(days=365)).split()[0]
     
     conn = cf.connect_to_db()
     cursor = conn.cursor()
@@ -72,7 +72,7 @@ def main(company_ceo_name, start_date, end_date):
     else:
         impact_firm = company_ceo_name
     start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
-    end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+    end_datetime = datetime.strptime(origin_end_date, "%Y-%m-%d")
     # 시작 날짜부터 종료 날짜까지 하루씩 감소
     current_datetime = start_datetime
     while current_datetime >= end_datetime:
