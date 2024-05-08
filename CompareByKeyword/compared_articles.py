@@ -89,7 +89,7 @@ def main(company_ceo_name, start_date, end_date):
         # 상위 기사 선택 후 보여주기
         how_rank_len = 10
         sim_seq_list = rank_sorted_series.index.to_frame()['seq'].head( how_rank_len )
-        total_final = data.query('seq in @sim_seq_list')[['seq', 'company_name', 'article_reg_date', 'title', 'article_text']]
+        total_final = data.query('seq in @sim_seq_list')[['seq', 'company_name', 'article_reg_date', 'title', 'article_text', 'article_link']]
         total_final_columns = ', '.join(total_final.columns)
         
         # 데이터베이스에 데이터 삽입
@@ -98,25 +98,25 @@ def main(company_ceo_name, start_date, end_date):
             # break
             delete_query = f'''
                 DELETE FROM stock_Korean_by_ESG_BackData.compared_articles
-                WHERE article_reg_date = '{row["article_reg_date"]}'
-                  AND company_name = '{row["company_name"]}'
+                WHERE comparison_article_reg_date = '{impact_date}'
+                  AND comparison_company_name = '{impact_firm}'
             '''
             cursor.execute(delete_query)
             conn.commit()
 
             insert_query = f'''
                 INSERT INTO stock_Korean_by_ESG_BackData.compared_articles
-                (articles_id, company_name, article_reg_date, title, article_text, load_date)
+                (articles_id, company_name, comparison_company_name, article_reg_date, comparison_article_reg_date, title, article_text, article_link, load_date)
                 VALUES
-                ({row["seq"]}, '{row["company_name"]}', '{row["article_reg_date"]}', '{row["title"]}', '{row["article_text"]}', NOW())
+                ({row["seq"]}, '{row["company_name"]}', '{impact_firm}', '{row["article_reg_date"]}', '{impact_date}', '{row["title"]}', '{row["article_text"]}', '{row["article_link"]}', NOW())
             '''
             # print (insert_query)
             # break  # for debug
             cursor.execute(insert_query)
             conn.commit()
 
-        cursor.close()
-        conn.close()
+    cursor.close()
+    conn.close()
 
-        cf.send_message("KOR", "compare scoring success")
-        print("비교 스코어링 데이터 저장 successfully.")
+    cf.send_message("KOR", "compare scoring success")
+    print("비교 스코어링 데이터 저장 successfully.")
