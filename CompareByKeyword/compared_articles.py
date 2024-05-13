@@ -77,6 +77,7 @@ def main(company_ceo_name, start_date, end_date):
     current_datetime = start_datetime
     while current_datetime >= end_datetime:
         target_date = str(current_datetime.strftime("%Y-%m-%d"))
+        target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
         current_datetime -= timedelta(days=1)
         print ("company_name :", target_firm)
         print ("article_reg_date :", target_date)
@@ -87,12 +88,13 @@ def main(company_ceo_name, start_date, end_date):
                                 + euclidean_dist_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
                                 + manhattan_dist_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1)
                                 ).sort_values( ascending=False,)
-        
         # 상위 기사 선택 후 보여주기
         how_rank_len = 10
         sim_seq_list = rank_sorted_series.index.to_frame()['seq'].head( how_rank_len )
+        # print ('sim_seq_list')
+        # print (sim_seq_list)
+        # print (len(sim_seq_list))
         total_final = data.query('seq in @sim_seq_list')[['seq', 'company_name', 'article_reg_date', 'title', 'article_text', 'article_link']]
-        
         # 데이터베이스에 데이터 삽입
         for index, row in total_final.iterrows():
             # print (row)  # type : <class 'pandas.core.series.Series'>
