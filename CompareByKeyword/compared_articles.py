@@ -8,8 +8,8 @@ from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances, man
 def main(company_ceo_name, start_date, end_date):
     start_date = start_date.replace('.', '-')
     origin_end_date = end_date.replace('.', '-')
-    # end_date = str(datetime.strptime(origin_end_date, '%Y-%m-%d') - timedelta(days=365)).split()[0]
-    end_date = str(datetime.strptime(origin_end_date, '%Y-%m-%d') - timedelta(days=10)).split()[0]  # for test
+    end_date = str(datetime.strptime(origin_end_date, '%Y-%m-%d') - timedelta(days=365)).split()[0]
+    # end_date = str(datetime.strptime(origin_end_date, '%Y-%m-%d') - timedelta(days=10)).split()[0]  # for test
     
     conn = cf.connect_to_db()
     cursor = conn.cursor()
