@@ -17,6 +17,7 @@ with open(f'{path}/env/config.yaml', encoding='UTF-8') as f:
     _cfg = yaml.load(f, Loader=yaml.FullLoader)
 
 DISCORD_WEBHOOK_URL = _cfg['DISCORD_WEBHOOK_URL']
+DART_API_KEY = _cfg['DART_API_KEY']
 headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.4459.183 Safari/537.36"}
 
 

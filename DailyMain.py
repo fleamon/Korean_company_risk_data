@@ -9,7 +9,7 @@ import ScoringByBert.bert_scoring as bert_scoring
 import ScoringByKeyword.keyword_scoring as keyword_scoring
 import CompareByKeyword.compared_articles as compared_articles
 import SummarizeArticles.summaize_articles as summaize_articles
-
+import dart.dart as dart
 
 def DailyMain():
     yesterday = datetime.now() - timedelta(days=1)
@@ -32,13 +32,17 @@ def DailyMain():
         # end_date = "2010.01.01"
         is_public = True
 
-        # article crawling
+        # article crawling (완료)
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
         # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
-        # 키워드비교 스코어링
+        # dart 공시자료 추가
+        # dart.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        dart.main(company_ceo_name, start_date, end_date)
+
+        # 키워드비교 스코어링 (완료)
         # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        compared_articles.main(company_ceo_name, start_date, end_date)
+        # compared_articles.main(company_ceo_name, start_date, end_date)
 
         # # 특정날짜 특정기업 기사 한줄요약
         # # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)

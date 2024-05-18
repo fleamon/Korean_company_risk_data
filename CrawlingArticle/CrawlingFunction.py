@@ -28,9 +28,9 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             current_datetime -= timedelta(days=1)
             naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
             daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
-            dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
-            fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, '에펨코리아')
-            clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, '클리앙')
+            # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
+            # fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, '에펨코리아')
+            # clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, '클리앙')
             print ("5 seconds sleep...")
             time.sleep(5)
 

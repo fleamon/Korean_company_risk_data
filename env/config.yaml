@@ -1,2 +1,4 @@
 # 디스코드 웹훅 URL
 DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1064271724184608948/IlbVL2ik7soGu-Hyr9DqFDRutLciuzAq95pNzH1tisPH1pwXq2WFN_5CJgcn3wNoHWhl"
+# DART API KEY
+DART_API_KEY: "c1cb1a485a7771762be34d8caa61880dbfd50e9d"
