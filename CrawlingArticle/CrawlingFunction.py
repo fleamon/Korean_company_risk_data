@@ -31,8 +31,6 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
             # fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, '에펨코리아')
             # clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, '클리앙')
-            print ("5 seconds sleep...")
-            time.sleep(5)
 
         cf.send_message("KOR", f"{query} 뉴스기사 DB 저장 success!")
         print(f"{query} 뉴스기사 DB 저장 successfully.")
@@ -107,6 +105,8 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
         article_link.remove(remove_url)
 
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+    print ("5 seconds sleep...")
+    time.sleep(5)
 
 
 def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
@@ -160,6 +160,8 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
             article_reg_date.append(crawling_date_id.replace(".", "-"))
 
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+    print ("5 seconds sleep...")
+    time.sleep(5)
 
 
 def dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
@@ -224,6 +226,8 @@ def dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, por
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+    print ("5 seconds sleep...")
+    time.sleep(5)
 
 
 def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
@@ -260,6 +264,8 @@ def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, port
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+    print ("5 seconds sleep...")
+    time.sleep(5)
 
 
 def clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
@@ -293,3 +299,5 @@ def clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
+    print ("5 seconds sleep...")
+    time.sleep(5)
