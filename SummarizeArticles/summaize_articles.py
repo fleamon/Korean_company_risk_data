@@ -34,9 +34,9 @@ def kogpt_api(prompt, max_tokens = 1, temperature = 1.0, top_p = 0, n = 1):
 def main(company_ceo_name, start_date, end_date):
     # 기업, 날짜
     if '+' in company_ceo_name:
-        impact_firm = company_ceo_name.split('+')[0]
+        target_firm = company_ceo_name.split('+')[0]
     else:
-        impact_firm = company_ceo_name
+        target_firm = company_ceo_name
     
     with open('./dill_files/score_dataframes.dill', 'rb') as f:
         data = dill.load(f)
@@ -46,11 +46,11 @@ def main(company_ceo_name, start_date, end_date):
     # 시작 날짜부터 종료 날짜까지 하루씩 감소
     current_datetime = start_datetime
     while current_datetime >= end_datetime:
-        impact_date = str(current_datetime.strftime("%Y-%m-%d"))
+        target_date = str(current_datetime.strftime("%Y-%m-%d"))
         current_datetime -= timedelta(days=1)
 
         # KoGPT에게 전달할 명령어 구성
-        article_texts = ' '.join(data.query( "company_name == @impact_firm and article_reg_date == @impact_date ")['article_text'].replace(r'\n+', ' ', regex=True) )
+        article_texts = ' '.join(data.query( "company_name == @target_firm and article_reg_date == @target_date ")['article_text'].replace(r'\n+', ' ', regex=True) )
         #prompt = article_texts + " \n 한줄 요약 : "
         prompt =  article_texts[:2000] + " \n 한줄 요약 : "
 
@@ -88,8 +88,8 @@ def main(company_ceo_name, start_date, end_date):
         # delete
         delete_query = f'''
         DELETE FROM stock_Korean_by_ESG_BackData.summaize_articles
-            WHERE company_name = '{impact_firm}'
-            AND article_reg_date = '{impact_date}'
+            WHERE company_name = '{target_firm}'
+            AND article_reg_date = '{target_date}'
         '''
         cursor.execute(delete_query)
 
@@ -98,7 +98,7 @@ def main(company_ceo_name, start_date, end_date):
             INSERT INTO stock_Korean_by_ESG_BackData.summaize_articles
             (company_name, article_reg_date, articles_summary, load_date)
             VALUES
-            ('{impact_firm}', '{impact_date}', '{articles_summary}', NOW())
+            ('{target_firm}', '{target_date}', '{articles_summary}', NOW())
         '''
         cursor.execute(insert_query)
         conn.commit()
