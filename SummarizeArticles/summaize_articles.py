@@ -106,8 +106,8 @@ def main(company_ceo_name, start_date, end_date):
         cursor.execute(insert_query)
         conn.commit()
 
-        cursor.close()
-        conn.close()
+    cursor.close()
+    conn.close()
 
     cf.send_message("KOR", "articles summarized success")
     print("해당일 해당기업 모든기사 한줄요약 데이터 저장 successfully.")

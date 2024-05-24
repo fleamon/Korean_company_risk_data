@@ -31,8 +31,7 @@ def DailyMain():
     # company_ceo_name_list = ['대한항공+조원태']
     for company_ceo_name in company_ceo_name_list:
         start_date = "2024.05.20"
-        end_date = "2024.05.20"
-        # end_date = "2019.01.01"
+        end_date = "2019.01.01"
         is_public = True
 
         # article crawling (완료) (커뮤니티 점검필요)
@@ -45,7 +44,7 @@ def DailyMain():
 
         # 특정날짜 특정기업 기사 한줄요약 (완료)
         # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        # summaize_articles.main(company_ceo_name, start_date, end_date)
+        summaize_articles.main(company_ceo_name, start_date, end_date)
         
         # 키워드비교 스코어링 (완료)
         # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
