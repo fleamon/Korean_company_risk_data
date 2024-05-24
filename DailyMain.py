@@ -27,34 +27,37 @@ def DailyMain():
     # company_ceo_name_list = ['카카오+김범수']
     # company_ceo_name_list = ['삼성전자+이재용']
     # company_ceo_name_list = ['한진+조원태', '대한항공+조원태']
-    company_ceo_name_list = ['한진+조원태']
+    company_ceo_name_list = ['한진칼,한진,대한항공+조원태']
     # company_ceo_name_list = ['대한항공+조원태']
     for company_ceo_name in company_ceo_name_list:
         start_date = "2024.05.20"
-        end_date = "2019.01.01"
+        end_date = "2024.05.20"
+        # end_date = "2019.01.01"
         is_public = True
 
-        # article crawling (완료)
+        # article crawling (완료) (커뮤니티 점검필요)
         # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
-        crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
+        # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
         # dart 공시자료 추가
         # dart.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # dart.main(company_ceo_name, start_date, end_date)
 
+        # 특정날짜 특정기업 기사 한줄요약 (완료)
+        # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # summaize_articles.main(company_ceo_name, start_date, end_date)
+        
         # 키워드비교 스코어링 (완료)
         # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        # compared_articles.main(company_ceo_name, start_date, end_date)
+        compared_articles.main(company_ceo_name, start_date, end_date)
 
-        # # 특정날짜 특정기업 기사 한줄요약
-        # # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        # summaize_articles.main(company_ceo_name, start_date, end_date)
-
-    # bert 스코어링 결과 저장 (param 필요없음(dill file))
-    # bert_scoring.main()
-    
-    # keyword로 스코어링 결과 저장 (param 필요없음(dill file))
-    # keyword_scoring.main()
+        # bert 스코어링 결과 저장
+        # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # bert_scoring.main(company_ceo_name, start_date, end_date)
+        
+        # keyword로 스코어링 결과 저장
+        # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # keyword_scoring.main(company_ceo_name, start_date, end_date)
 
 
 if __name__ == '__main__':

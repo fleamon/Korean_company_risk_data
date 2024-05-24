@@ -6,49 +6,9 @@ from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances, man
 
 
 def main(company_ceo_name, start_date, end_date):
-    start_date = start_date.replace('.', '-')
-    origin_end_date = end_date.replace('.', '-')
-    end_date = str(datetime.strptime(origin_end_date, '%Y-%m-%d') - timedelta(days=365)).split()[0]
-    # end_date = str(datetime.strptime(origin_end_date, '%Y-%m-%d') - timedelta(days=10)).split()[0]  # for test
-    
     conn = cf.connect_to_db()
     cursor = conn.cursor()
-    query = f"SELECT * FROM stock_Korean_by_ESG_BackData.articles WHERE article_reg_date BETWEEN '{end_date}' AND '{start_date}'"
     
-    data = pd.read_sql(query, conn)
-    # print (data)
-    
-    print ("tfidf_vectorizer")
-    tfidf_vectorizer = TfidfVectorizer()
-    print ("tfidf_matrix")
-    tfidf_matrix = tfidf_vectorizer.fit_transform(data['article_text'])
-    
-    print ("cosine_similarities")
-    cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix)
-    print ("euclidean_distances_matrix")
-    euclidean_distances_matrix = euclidean_distances(tfidf_matrix, tfidf_matrix)
-    print ("manhattan_distances_matrix")
-    manhattan_distances_matrix = manhattan_distances(tfidf_matrix, tfidf_matrix)
-    
-    cosine_sim_df = pd.DataFrame(cosine_similarities,  
-                                columns = data['seq'] , 
-                                index = pd.MultiIndex.from_frame( data[['seq', 'article_reg_date', 'company_name',]] ) , 
-                                )
-    # rank로 변환
-    cosine_sim_rank_df = cosine_sim_df.rank(axis=1, method='min')
-    euclidean_dist_df = pd.DataFrame(euclidean_distances_matrix,  
-                                columns = data['seq'] , 
-                                index = pd.MultiIndex.from_frame( data[['seq', 'article_reg_date', 'company_name',]] ) , 
-                                )
-    # 거리 짧을수록 높은 점수
-    euclidean_dist_rank_df = euclidean_dist_df.rank(axis=1, ascending = False)
-    manhattan_dist_df = pd.DataFrame(manhattan_distances_matrix,  
-                                columns = data['seq'] , 
-                                index = pd.MultiIndex.from_frame( data[['seq', 'article_reg_date', 'company_name',]] ) , 
-                                )
-    #거리 짧을수록 높은 점수
-    manhattan_dist_rank_df = manhattan_dist_df.rank(axis=1, ascending = False)
-
     # MySQL 테이블 생성
     create_table_query = """
     CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.compared_articles (
@@ -73,16 +33,65 @@ def main(company_ceo_name, start_date, end_date):
             target_firm_list = target_firm.split(',')
     else:
         target_firm = company_ceo_name
-    start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
-    end_datetime = datetime.strptime(origin_end_date, "%Y-%m-%d")
+
+
+    start_date_param = start_date.replace('.', '-')
+    end_date_param = end_date.replace('.', '-')
+    
+    start_date_loop = datetime.strptime(start_date_param, "%Y-%m-%d")
+    end_date_loop = datetime.strptime(end_date_param, "%Y-%m-%d")
     # 시작 날짜부터 종료 날짜까지 하루씩 감소
-    current_datetime = start_datetime
-    while current_datetime >= end_datetime:
-        target_date = str(current_datetime.strftime("%Y-%m-%d"))
-        target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
-        current_datetime -= timedelta(days=1)
+    current_date_loop = start_date_loop
+    while current_date_loop >= end_date_loop:
+        target_date = current_date_loop.date()
+        start_date = current_date_loop.strftime('%Y-%m-%d')
+        end_date = (current_date_loop - timedelta(days=365)).strftime('%Y-%m-%d')
+        # end_date = (current_date_loop - timedelta(days=10)).strftime('%Y-%m-%d')  # for test
+        
         print ("company_name :", target_firm)
         print ("article_reg_date :", target_date)
+
+        query = f"SELECT * FROM stock_Korean_by_ESG_BackData.articles WHERE article_reg_date BETWEEN '{end_date}' AND '{start_date}'"
+
+        current_date_loop -= timedelta(days=1)
+    
+        data = pd.read_sql(query, conn)
+        # print (data)
+        
+        print ("tfidf_vectorizer")
+        tfidf_vectorizer = TfidfVectorizer()
+        print ("tfidf_matrix")
+        tfidf_matrix = tfidf_vectorizer.fit_transform(data['article_text'])
+        
+        print ("cosine_similarities")
+        cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix)
+        print ("euclidean_distances_matrix")
+        euclidean_distances_matrix = euclidean_distances(tfidf_matrix, tfidf_matrix)
+        print ("manhattan_distances_matrix")
+        manhattan_distances_matrix = manhattan_distances(tfidf_matrix, tfidf_matrix)
+        
+        cosine_sim_df = pd.DataFrame(cosine_similarities,  
+                                    columns = data['seq'] , 
+                                    index = pd.MultiIndex.from_frame( data[['seq', 'article_reg_date', 'company_name',]] ) , 
+                                    )
+        # rank로 변환
+        cosine_sim_rank_df = cosine_sim_df.rank(axis=1, method='min')
+        euclidean_dist_df = pd.DataFrame(euclidean_distances_matrix,  
+                                    columns = data['seq'] , 
+                                    index = pd.MultiIndex.from_frame( data[['seq', 'article_reg_date', 'company_name',]] ) , 
+                                    )
+        # 거리 짧을수록 높은 점수
+        euclidean_dist_rank_df = euclidean_dist_df.rank(axis=1, ascending = False)
+        manhattan_dist_df = pd.DataFrame(manhattan_distances_matrix,  
+                                    columns = data['seq'] , 
+                                    index = pd.MultiIndex.from_frame( data[['seq', 'article_reg_date', 'company_name',]] ) , 
+                                    )
+        #거리 짧을수록 높은 점수
+        manhattan_dist_rank_df = manhattan_dist_df.rank(axis=1, ascending = False)
+
+
+
+
         # 해당 일에 뉴스들과 유사도가 높은 뉴스 확인 (rank 클수록 더 유사도 높음)
         # 추가로 해당 기업 제외 뉴스들 + 해당 일자 제외( 해당일에 다른거로 너무 많이 작성함.)
         if len(target_firm_list) > 0:
