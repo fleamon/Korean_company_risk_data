@@ -69,6 +69,8 @@ def main(company_ceo_name, start_date, end_date):
     # 해당 기업, 날짜
     if '+' in company_ceo_name:
         target_firm = company_ceo_name.split('+')[0]
+        if ',' in target_firm:
+            target_firm_list = target_firm.split(',')
     else:
         target_firm = company_ceo_name
     start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
@@ -83,11 +85,18 @@ def main(company_ceo_name, start_date, end_date):
         print ("article_reg_date :", target_date)
         # 해당 일에 뉴스들과 유사도가 높은 뉴스 확인 (rank 클수록 더 유사도 높음)
         # 추가로 해당 기업 제외 뉴스들 + 해당 일자 제외( 해당일에 다른거로 너무 많이 작성함.)
-        seq_series = cosine_sim_rank_df.query("company_name == @target_firm and article_reg_date == @target_date").index.to_frame(index = False)['seq']
-        rank_sorted_series = ( cosine_sim_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
-                                + euclidean_dist_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
-                                + manhattan_dist_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1)
-                                ).sort_values( ascending=False,)
+        if len(target_firm_list) > 0:
+            seq_series = cosine_sim_rank_df.query("company_name in @target_firm_list and article_reg_date == @target_date").index.to_frame(index = False)['seq']
+            rank_sorted_series = ( cosine_sim_rank_df.query("company_name not in @target_firm_list and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
+                                    + euclidean_dist_rank_df.query("company_name not in @target_firm_list and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
+                                    + manhattan_dist_rank_df.query("company_name not in @target_firm_list and article_reg_date != @target_date")[seq_series].sum(axis = 1)
+                                    ).sort_values( ascending=False,)
+        else:
+            seq_series = cosine_sim_rank_df.query("company_name == @target_firm and article_reg_date == @target_date").index.to_frame(index = False)['seq']
+            rank_sorted_series = ( cosine_sim_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
+                                    + euclidean_dist_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
+                                    + manhattan_dist_rank_df.query("company_name != @target_firm and article_reg_date != @target_date")[seq_series].sum(axis = 1)
+                                    ).sort_values( ascending=False,)
         # 상위 기사 선택 후 보여주기
         how_rank_len = 10
         sim_seq_list = rank_sorted_series.index.to_frame()['seq'].head( how_rank_len )
