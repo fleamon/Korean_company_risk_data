@@ -89,9 +89,6 @@ def main(company_ceo_name, start_date, end_date):
         #거리 짧을수록 높은 점수
         manhattan_dist_rank_df = manhattan_dist_df.rank(axis=1, ascending = False)
 
-
-
-
         # 해당 일에 뉴스들과 유사도가 높은 뉴스 확인 (rank 클수록 더 유사도 높음)
         # 추가로 해당 기업 제외 뉴스들 + 해당 일자 제외( 해당일에 다른거로 너무 많이 작성함.)
         if len(target_firm_list) > 0:
