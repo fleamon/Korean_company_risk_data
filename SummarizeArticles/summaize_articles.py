@@ -36,6 +36,22 @@ def main(company_ceo_name, start_date, end_date):
 
     conn = cf.connect_to_db()
     cursor = conn.cursor()
+    # MySQL 테이블 생성
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.summaize_articles (
+    seq bigint NOT NULL AUTO_INCREMENT,
+    company_name varchar(255) DEFAULT NULL COMMENT '기업명',
+    article_reg_date date DEFAULT NULL COMMENT '기사 발행일',
+    articles_summary text DEFAULT NULL COMMENT '기사 한줄요약',
+    load_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '저장시간',
+    PRIMARY KEY (seq),
+    KEY idx_company_name (company_name),
+    KEY idx_article_reg_date (article_reg_date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """
+    cursor.execute(create_table_query)
+    conn.commit()
+
     query = f"SELECT * FROM stock_Korean_by_ESG_BackData.articles WHERE article_reg_date BETWEEN '{end_date}' AND '{start_date}'"
     data = pd.read_sql(query, conn)
     
@@ -71,22 +87,6 @@ def main(company_ceo_name, start_date, end_date):
 
         # print (response['generations'][0]['text'])  # 한줄요약 확인
         articles_summary = cf.delete_patterns(response['generations'][0]['text'])
-
-        # MySQL 테이블 생성
-        create_table_query = """
-        CREATE TABLE IF NOT EXISTS stock_Korean_by_ESG_BackData.summaize_articles (
-        seq bigint NOT NULL AUTO_INCREMENT,
-        company_name varchar(255) DEFAULT NULL COMMENT '기업명',
-        article_reg_date date DEFAULT NULL COMMENT '기사 발행일',
-        articles_summary text DEFAULT NULL COMMENT '기사 한줄요약',
-        load_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '저장시간',
-        PRIMARY KEY (seq),
-        KEY idx_company_name (company_name),
-        KEY idx_article_reg_date (article_reg_date)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-        """
-        cursor.execute(create_table_query)
-        conn.commit()
 
         # delete
         delete_query = f'''
