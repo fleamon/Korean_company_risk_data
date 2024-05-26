@@ -1,4 +1,5 @@
 import pandas as pd
+import gc
 import CommonFunction as cf
 from datetime import datetime, timedelta
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -45,8 +46,8 @@ def main(company_ceo_name, start_date, end_date):
     while current_date_loop >= end_date_loop:
         target_date = current_date_loop.date()
         start_date = current_date_loop.strftime('%Y-%m-%d')
-        end_date = (current_date_loop - timedelta(days=365)).strftime('%Y-%m-%d')
-        # end_date = (current_date_loop - timedelta(days=10)).strftime('%Y-%m-%d')  # for test
+        # end_date = (current_date_loop - timedelta(days=365)).strftime('%Y-%m-%d')
+        end_date = (current_date_loop - timedelta(days=180)).strftime('%Y-%m-%d')  # for test
         
         print ("company_name :", target_firm)
         print ("article_reg_date :", target_date)
@@ -132,6 +133,26 @@ def main(company_ceo_name, start_date, end_date):
             # break  # for debug
             cursor.execute(insert_query)
             conn.commit()
+
+        # 변수 정리
+        del data
+        del tfidf_matrix
+        del cosine_similarities
+        del euclidean_distances_matrix
+        del manhattan_distances_matrix
+        del cosine_sim_df
+        del cosine_sim_rank_df
+        del euclidean_dist_df
+        del euclidean_dist_rank_df
+        del manhattan_dist_df
+        del manhattan_dist_rank_df
+        del seq_series
+        del rank_sorted_series
+        del sim_seq_list
+        del total_final
+        
+        # gc 강제 실행
+        gc.collect()
 
     cursor.close()
     conn.close()
