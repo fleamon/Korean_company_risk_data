@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 
 # [내 애플리케이션] > [앱 키] 에서 확인한 REST API 키 값 입력
-REST_API_KEY = 'dd9dabaea4281ddcce17686147ff301b'
+REST_API_KEY = '477fc15718fc798560927cde08df28c8'
 
 # KoGPT API 호출을 위한 함수
 # 각 파라미터 기본값으로 설정
