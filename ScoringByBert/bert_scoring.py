@@ -10,6 +10,8 @@ model = ReformerModel.from_pretrained('google/reformer-crime-and-punishment')
 
 
 def calculate_bert_score(text):
+    if not text.strip():
+        return 0.0
     # 텍스트를 토큰으로 분리
     tokens = tokenizer.encode(text, add_special_tokens=True, return_tensors='pt')
     # Reformer 모델을 통해 embedding 벡터 계산
