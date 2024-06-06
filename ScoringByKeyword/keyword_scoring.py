@@ -1,9 +1,78 @@
 import pandas as pd
 import CommonFunction as cf
 from datetime import datetime, timedelta
+import os
+import gspread
+from google.oauth2.service_account import Credentials
 
 
 def main(company_ceo_name, start_date, end_date):
+    current_path = os.getcwd()
+    # 서비스 계정 키 파일 경로
+    SERVICE_ACCOUNT_FILE = f'{current_path}/env/fluted-union-425618-q4-a7a2d23ac8d2.json'
+
+    # 접근 범위 정의
+    SCOPES = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
+
+    # 자격 증명 설정
+    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+    # gspread 클라이언트 생성
+    client = gspread.authorize(creds)
+
+    # Google Sheets 문서의 ID와 시트 이름
+    SPREADSHEET_ID = '1SEs_cwQfCK3j6Ltad5jHyTiH8xf9xLvR_PzahGVhNIo'
+    SHEET_NAME = 'ESG NP Keyword'
+
+    # 스프레드시트
+    spreadsheet = client.open_by_key(SPREADSHEET_ID)
+    sheet = spreadsheet.worksheet(SHEET_NAME)
+    
+    data = sheet.get_values()
+    
+    # keyword, weight
+    e_posi_keyword = []
+    e_posi_weight = []
+    e_nega_keyword = []
+    e_nega_weight = []
+    s_posi_keyword = []
+    s_posi_weight = []
+    s_nega_keyword = []
+    s_nega_weight = []
+    g_posi_keyword = []
+    g_posi_weight = []
+    g_nega_keyword = []
+    g_nega_weight = []
+    for row in data[2:]:
+        e_posi_keyword.append(row[0])
+        e_posi_weight.append(row[1])
+        e_nega_keyword.append(row[2])
+        e_nega_weight.append(row[3])
+        s_posi_keyword.append(row[4])
+        s_posi_weight.append(row[5])
+        s_nega_keyword.append(row[6])
+        s_nega_weight.append(row[7])
+        g_posi_keyword.append(row[8])
+        g_posi_weight.append(row[9])
+        g_nega_keyword.append(row[10])
+        g_nega_weight.append(row[11])
+
+    e_posi_keyword = [element for element in e_posi_keyword if element]
+    e_posi_weight = [int(element) * -1 for element in e_posi_weight if element]
+    e_nega_keyword = [element for element in e_nega_keyword if element]
+    e_nega_weight = [element for element in e_nega_weight if element]
+    s_posi_keyword = [element for element in s_posi_keyword if element]
+    s_posi_weight = [int(element) * -1 for element in s_posi_weight if element]
+    s_nega_keyword = [element for element in s_nega_keyword if element]
+    s_nega_weight = [element for element in s_nega_weight if element]
+    g_posi_keyword = [element for element in g_posi_keyword if element]
+    g_posi_weight = [int(element) * -1 for element in g_posi_weight if element]
+    g_nega_keyword = [element for element in g_nega_keyword if element]
+    g_nega_weight = [element for element in g_nega_weight if element]
+
     start_date = start_date.replace('.', '-')
     end_date = end_date.replace('.', '-')
 
@@ -25,46 +94,6 @@ def main(company_ceo_name, start_date, end_date):
     """
     cursor.execute(create_table_query)
     conn.commit()
-
-    ############################################################
-
-    e_positive_keyword_list = ['친환경', '탄소중립', '생물 다양성',
-                            '에너지 효율', 'RE100', '생태계',
-                            '전환', '체결',
-                            '수소', '저탄소', '실천','친환경 소비',
-                            ]
-
-    e_negative_keyword_list = ['그린워싱', '탄소 배출', '배출', 
-                            '플라스틱', '인체', '폐기물', 
-                            '기후변화', '재난', '오염', 
-                            '지구 온난화', '환경 파괴', '미세먼지', '종이컵',
-                            ]
-
-    ############################################################
-
-    s_positive_keyword_list = ['상생', '지역사회', '협력', '사회적 책임',
-                            '고객', '고객 만족', '공급망 관리', 
-                            '근로자 안전', '프라이버시', '데이터 보호', 
-                            '노조', '사회 환원', '일자리',]
-
-    s_negative_keyword_list  = ['기술 탈취', '독점', '불공정 경쟁', 
-                                '이중계약', '문어발', '해고', 
-                                '불법', '척결', '처벌', '형사처벌', 
-                                '반대 단체', '청탁', '부정 청탁',]
-
-    ############################################################
-
-    g_positive_keyword_list =  ['주주권', '주주 보호', '사외이사', 
-                                '다양성', '주주 환원', '윤리 경영', 
-                                '책임 경영', '성장', '글로벌', 
-                                '평가', '투자', '미래', '윤리',]
-
-    g_negative_keyword_list = ['구속', '법정구속', '압수수색', 
-                            '사법 리스크', '조작', '인수 무산', 
-                            '실형', '뇌물', '시세조종', '기소', 
-                            '위반', '재판', '리스크',]
-
-    ############################################################
 
     # 기업, 날짜
     if '+' in company_ceo_name:
@@ -88,126 +117,43 @@ def main(company_ceo_name, start_date, end_date):
         if data.empty:
             continue
         
-        keword_count_column_list = []
-        for keyword in e_positive_keyword_list + e_negative_keyword_list + s_positive_keyword_list + s_negative_keyword_list + g_positive_keyword_list + g_negative_keyword_list :
-            column_name = 'keword_'+ keyword +'_count'
-            data[column_name] = data['article_text'].str.count( keyword )
-            keword_count_column_list.append(column_name)
+        posi_keyword_list = e_posi_keyword + s_posi_keyword + g_posi_keyword
+        posi_weight_list = e_posi_weight + s_posi_weight + g_posi_weight
+        posi_score = 0
+        for keyword, weight in zip(posi_keyword_list, posi_weight_list):
+            posi_score += data['article_text'].str.count(keyword) * int(weight)
 
-        data['esg_cnt_weight'] = data[keword_count_column_list].sum(axis = 1)
-        data['title_positive_score'] = 1
-        data['title_neutral_score'] = 1
-        data['title_negative_score'] = 1
-        data['article_positive_score'] = 1
-        data['article_neutral_score'] = 1
-        data['article_negative_score'] = 1
-
-        pos_dataframes = []
-        neg_dataframes = []
-    
-        # 일별 점수 산출
-        daily_grouped_scroes_df = data[
-            [
-                'article_reg_date', 'company_name',
-                
-                'title_positive_score', 'title_negative_score', 
-                'article_positive_score', 'article_negative_score',
-
-                'keword_친환경_count', 'keword_탄소중립_count', 'keword_생물 다양성_count', 
-                'keword_에너지 효율_count', 'keword_RE100_count', 'keword_생태계_count', 
-                'keword_전환_count', 'keword_체결_count',
-                'keword_수소_count', 'keword_저탄소_count', 'keword_실천_count',
-                'keword_친환경 소비_count', 
-
-                'keword_그린워싱_count', 'keword_탄소 배출_count', 'keword_배출_count',
-                'keword_플라스틱_count', 'keword_인체_count', 'keword_폐기물_count', 
-                'keword_기후변화_count', 'keword_재난_count', 'keword_오염_count',
-                'keword_지구 온난화_count', 'keword_환경 파괴_count', 'keword_미세먼지_count', 
-                'keword_종이컵_count', 
-
-                'keword_상생_count', 'keword_지역사회_count', 'keword_협력_count', 
-                'keword_사회적 책임_count', 'keword_고객_count', 'keword_고객 만족_count', 
-                'keword_공급망 관리_count', 'keword_근로자 안전_count', 'keword_프라이버시_count', 
-                'keword_데이터 보호_count', 'keword_노조_count', 'keword_사회 환원_count', 
-                'keword_일자리_count', 
-
-                'keword_기술 탈취_count', 'keword_독점_count', 'keword_불공정 경쟁_count', 
-                'keword_이중계약_count', 'keword_문어발_count', 'keword_해고_count',
-                'keword_불법_count', 'keword_척결_count', 'keword_처벌_count',
-                'keword_형사처벌_count', 'keword_반대 단체_count', 'keword_청탁_count',
-                'keword_부정 청탁_count', 
-                
-                'keword_주주권_count', 'keword_주주 보호_count', 'keword_사외이사_count', 
-                'keword_다양성_count', 'keword_주주 환원_count', 'keword_윤리 경영_count', 
-                'keword_책임 경영_count', 'keword_성장_count', 'keword_글로벌_count', 
-                'keword_평가_count', 'keword_투자_count', 'keword_미래_count',
-                'keword_윤리_count',
-
-                'keword_구속_count', 'keword_법정구속_count', 'keword_압수수색_count', 
-                'keword_사법 리스크_count', 'keword_조작_count','keword_인수 무산_count', 
-                'keword_실형_count', 'keword_뇌물_count', 'keword_시세조종_count', 
-                'keword_기소_count', 'keword_위반_count', 'keword_재판_count',
-                'keword_리스크_count',
-                
-                'esg_cnt_weight',
-            ]
-        ].groupby( ['article_reg_date', 'company_name']).agg( { 'sum', 'count' }).reset_index().set_index([ 'article_reg_date',  'company_name'] )
-
-        # 데이터 프레임 생성
-        daily_grouped_scroes_df = pd.pivot(daily_grouped_scroes_df.reset_index() , index='article_reg_date', columns='company_name').asfreq('D').fillna(0)
+        nega_score = 0
+        nega_keyword_list = e_nega_keyword + s_nega_keyword + g_nega_keyword
+        nega_weight_list = e_nega_weight + s_nega_weight + g_nega_weight
+        for keyword, weight in zip(nega_keyword_list, nega_weight_list):
+            nega_score += data['article_text'].str.count(keyword) * int(weight)
         
-        # 일별 스코어 최종 집계
-        article_positive_scores_df = (0 - daily_grouped_scroes_df['article_positive_score']['sum'] * daily_grouped_scroes_df['article_positive_score']['count'])
-        article_negative_scores_df = (daily_grouped_scroes_df['article_negative_score']['sum'] * daily_grouped_scroes_df['article_negative_score']['count'])
-        pos_dataframes.append(pd.melt(article_positive_scores_df.reset_index(), id_vars = ['article_reg_date']))
-        neg_dataframes.append(pd.melt(article_negative_scores_df.reset_index(), id_vars = ['article_reg_date']))
-    
-        # dataframe merge
-        pos_df = pd.concat(pos_dataframes)
-        pos_df.columns = ["article_reg_date", "company_name", "positive_score"]
-
-        neg_df = pd.concat(neg_dataframes)
-        neg_df.columns = ["article_reg_date", "company_name", "negative_score"]
-
-        merged_df = pd.merge( pos_df, neg_df, on = [ "article_reg_date", "company_name"], how = "outer")
-
-        merged_df.fillna('NULL', inplace=True)
-        print (merged_df)
-
-        merged_df_columns = ', '.join(merged_df.columns[1:])
-        print (merged_df_columns)
-
         # 데이터베이스에 데이터 삽입
-        for index, row in merged_df.iterrows():
-            # print (row.name)  # <class 'pandas._libs.tslibs.timestamps.Timestamp'>
-            # print (row)  # type : <class 'pandas.core.series.Series'>
-            # break
-            article_reg_date = str(row["article_reg_date"]).split(' ')[0]
-            company_name = str(row["company_name"])
-            delete_query = f'''
-                DELETE FROM stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
-                WHERE date_id = '{article_reg_date}'
-                AND company_name = '{company_name}'
-            '''
-            cursor.execute(delete_query)
-            conn.commit()
+        delete_query = f'''
+            DELETE FROM stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
+            WHERE date_id = '{target_date}'
+            AND company_name = '{target_firm}'
+        '''
+        # print (delete_query)
+        cursor.execute(delete_query)
+        conn.commit()
 
-            insert_query = f'''
-                INSERT INTO stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
-                (date_id, {merged_df_columns}, load_date)
-                VALUES
-                ('{article_reg_date}'
-                , '{row["company_name"]}'
-                , {row["positive_score"]}
-                , {row["negative_score"]}
-                , NOW())
-                ON DUPLICATE KEY UPDATE 
-                date_id=VALUES(date_id)
-            '''
-            # print (insert_query)
-            # break  # for debug
-            cursor.execute(insert_query)
-            conn.commit()
+        insert_query = f'''
+            INSERT INTO stock_Korean_by_ESG_BackData.articles_posi_nega_scoring
+            (date_id, company_name, positive_score, negative_score, load_date)
+            VALUES
+            ('{target_date}'
+            , '{target_firm}'
+            , {posi_score.sum()}
+            , {nega_score.sum()}
+            , NOW())
+            ON DUPLICATE KEY UPDATE 
+            date_id=VALUES(date_id)
+        '''
+        # print (insert_query)
+        cursor.execute(insert_query)
+        conn.commit()
 
     cursor.close()
     conn.close()
