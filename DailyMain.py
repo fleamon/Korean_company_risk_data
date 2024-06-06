@@ -26,9 +26,9 @@ def DailyMain():
     # company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용', '현대자동차+정의선', 'LG+구광모', 'SK+최태원']
     # company_ceo_name_list = ['카카오+김범수']
     # company_ceo_name_list = ['삼성전자+이재용']
-    # company_ceo_name_list = ['한진+조원태', '대한항공+조원태']
-    company_ceo_name_list = ['한진칼,한진,대한항공+조원태']
-    # company_ceo_name_list = ['대한항공+조원태']
+    company_ceo_name_list = ['한진+조원태', '대한항공+조원태', '한진칼+조원태']
+    # company_ceo_name_list = ['한진+조원태']
+    # company_ceo_name_list = ['한진칼,한진,대한항공+조원태']
     for company_ceo_name in company_ceo_name_list:
         start_date = "2024.05.20"
         # start_date = "2024.03.27"
@@ -53,11 +53,11 @@ def DailyMain():
 
         # bert 스코어링 결과 저장
         # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        bert_scoring.main(company_ceo_name, start_date, end_date)
+        # bert_scoring.main(company_ceo_name, start_date, end_date)
         
         # keyword로 스코어링 결과 저장
         # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        # keyword_scoring.main(company_ceo_name, start_date, end_date)
+        keyword_scoring.main(company_ceo_name, start_date, end_date)
 
 
 if __name__ == '__main__':

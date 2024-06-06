@@ -83,8 +83,10 @@ def main(company_ceo_name, start_date, end_date):
         print ("company_name :", target_firm)
         print ("article_reg_date :", target_date)
 
-        query = f"SELECT article_reg_date, company_name, title, article_text FROM stock_Korean_by_ESG_BackData.articles WHERE article_reg_date = '{target_date}'"
+        query = f"SELECT article_reg_date, company_name, title, article_text FROM stock_Korean_by_ESG_BackData.articles WHERE article_reg_date = '{target_date}' AND company_name = '{target_firm}'"
         data = pd.read_sql(query, conn)
+        if data.empty:
+            continue
         
         keword_count_column_list = []
         for keyword in e_positive_keyword_list + e_negative_keyword_list + s_positive_keyword_list + s_negative_keyword_list + g_positive_keyword_list + g_negative_keyword_list :
@@ -93,9 +95,12 @@ def main(company_ceo_name, start_date, end_date):
             keword_count_column_list.append(column_name)
 
         data['esg_cnt_weight'] = data[keword_count_column_list].sum(axis = 1)
-
-        # data["title_class"] = data[['title_positive_score', 'title_neutral_score', 'title_negative_score']].idxmax(axis = 1).str.replace("title_", "").str.replace("article_", "").str.replace("_score", "")
-        data["article_class"] =  data[['article_positive_score', 'article_neutral_score', 'article_negative_score']].idxmax(axis = 1).str.replace("title_", "").str.replace("article_", "").str.replace("_score", "")
+        data['title_positive_score'] = 1
+        data['title_neutral_score'] = 1
+        data['title_negative_score'] = 1
+        data['article_positive_score'] = 1
+        data['article_neutral_score'] = 1
+        data['article_negative_score'] = 1
 
         pos_dataframes = []
         neg_dataframes = []
@@ -105,7 +110,7 @@ def main(company_ceo_name, start_date, end_date):
             [
                 'article_reg_date', 'company_name',
                 
-                # 'title_positive_score', 'title_negative_score', 
+                'title_positive_score', 'title_negative_score', 
                 'article_positive_score', 'article_negative_score',
 
                 'keword_친환경_count', 'keword_탄소중립_count', 'keword_생물 다양성_count', 
@@ -145,18 +150,15 @@ def main(company_ceo_name, start_date, end_date):
                 'keword_리스크_count',
                 
                 'esg_cnt_weight',
-
-                #'title_class', 
-                #'article_class',
             ]
         ].groupby( ['article_reg_date', 'company_name']).agg( { 'sum', 'count' }).reset_index().set_index([ 'article_reg_date',  'company_name'] )
 
         # 데이터 프레임 생성
         daily_grouped_scroes_df = pd.pivot(daily_grouped_scroes_df.reset_index() , index='article_reg_date', columns='company_name').asfreq('D').fillna(0)
-
+        
         # 일별 스코어 최종 집계
-        article_positive_scores_df = (0 - daily_grouped_scroes_df['article_positive_score']['sum'] * daily_grouped_scroes_df['article_positive_score']['count']).rolling(5).mean()
-        article_negative_scores_df = (daily_grouped_scroes_df['article_negative_score']['sum'] * daily_grouped_scroes_df['article_negative_score']['count']).rolling(5).mean()
+        article_positive_scores_df = (0 - daily_grouped_scroes_df['article_positive_score']['sum'] * daily_grouped_scroes_df['article_positive_score']['count'])
+        article_negative_scores_df = (daily_grouped_scroes_df['article_negative_score']['sum'] * daily_grouped_scroes_df['article_negative_score']['count'])
         pos_dataframes.append(pd.melt(article_positive_scores_df.reset_index(), id_vars = ['article_reg_date']))
         neg_dataframes.append(pd.melt(article_negative_scores_df.reset_index(), id_vars = ['article_reg_date']))
     
@@ -169,19 +171,6 @@ def main(company_ceo_name, start_date, end_date):
 
         merged_df = pd.merge( pos_df, neg_df, on = [ "article_reg_date", "company_name"], how = "outer")
 
-        # merged_df = merged_df.replace("삼성전자", "samsung")
-        # merged_df = merged_df.replace("현대자동차", "hyundai")
-        # merged_df = merged_df.replace("네이버", "naver")
-        # merged_df = merged_df.replace("라인", "line")
-        # merged_df = merged_df.replace("카카오", "kakao")
-        # merged_df = merged_df.replace("쿠팡", "coupang")
-        # merged_df = merged_df.replace("우버코리아", "uber")
-        # merged_df = merged_df.replace("모빌리티", "mobility")
-        # merged_df = merged_df.replace("페이", "pay")
-        # merged_df = merged_df.replace("토스", "toss")
-        # merged_df = merged_df.replace("배달의민족", "delivery")
-        # merged_df = merged_df.replace("우아한형제들", "brothers")
-        # merged_df = merged_df.replace("파이낸셜", "finance")
         merged_df.fillna('NULL', inplace=True)
         print (merged_df)
 
