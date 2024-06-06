@@ -51,11 +51,11 @@ def DailyMain():
         # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # compared_articles.main(company_ceo_name, start_date, end_date)
 
-        # bert 스코어링 결과 저장
+        # bert 스코어링 결과 저장 (완료)
         # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         # bert_scoring.main(company_ceo_name, start_date, end_date)
         
-        # keyword로 스코어링 결과 저장
+        # keyword로 스코어링 결과 저장 (완료)
         # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         keyword_scoring.main(company_ceo_name, start_date, end_date)
 
