@@ -28,6 +28,7 @@ def main(company_ceo_name, start_date, end_date):
     conn.commit()
     
     # 해당 기업, 날짜
+    target_firm_list = []
     if '+' in company_ceo_name:
         target_firm = company_ceo_name.split('+')[0]
         if ',' in target_firm:
@@ -92,7 +93,7 @@ def main(company_ceo_name, start_date, end_date):
 
         # 해당 일에 뉴스들과 유사도가 높은 뉴스 확인 (rank 클수록 더 유사도 높음)
         # 추가로 해당 기업 제외 뉴스들 + 해당 일자 제외( 해당일에 다른거로 너무 많이 작성함.)
-        if target_firm_list:
+        if len(target_firm_list) > 0:
             seq_series = cosine_sim_rank_df.query("company_name in @target_firm_list and article_reg_date == @target_date").index.to_frame(index = False)['seq']
             rank_sorted_series = ( cosine_sim_rank_df.query("company_name not in @target_firm_list and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
                                     + euclidean_dist_rank_df.query("company_name not in @target_firm_list and article_reg_date != @target_date")[seq_series].sum(axis = 1) 
