@@ -28,12 +28,12 @@ def DailyMain():
     # company_ceo_name_list = ['삼성전자+이재용']
     # company_ceo_name_list = ['한진+조원태', '대한항공+조원태', '한진칼+조원태']
     # company_ceo_name_list = ['한진칼,한진,대한항공+조원태']
-    # company_ceo_name_list = ['하이브+방시혁']
-    company_ceo_name_list = ['포스코+장인화']
+    company_ceo_name_list = ['하이브+방시혁']
+    # company_ceo_name_list = ['포스코+장인화']
     for company_ceo_name in company_ceo_name_list:
         start_date = "2024.06.08"
-        # end_date = "2023.01.01"  # 하이브
-        end_date = "2024.01.01"  # 포스코
+        end_date = "2023.01.01"  # 하이브
+        # end_date = "2024.01.01"  # 포스코
         is_public = True
 
         # article crawling (완료) (커뮤니티 점검필요)
