@@ -31,7 +31,7 @@ def DailyMain():
     company_ceo_name_list = ['하이브+방시혁']
     # company_ceo_name_list = ['포스코+장인화']
     for company_ceo_name in company_ceo_name_list:
-        start_date = "2024.06.08"
+        start_date = "2023.07.12"
         end_date = "2023.01.01"  # 하이브
         # end_date = "2024.01.01"  # 포스코
         is_public = True
@@ -65,10 +65,6 @@ def DailyMain():
         # 특정날짜 특정기업 기사 한줄요약 (완료)
         # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         summaize_articles.main(company_ceo_name, start_date, end_date)
-        
-        # 키워드비교 스코어링 (완료)
-        # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        compared_articles.main(company_ceo_name, start_date, end_date)
 
         # bert 스코어링 결과 저장 (완료)
         # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
@@ -77,6 +73,10 @@ def DailyMain():
         # keyword로 스코어링 결과 저장 (완료)
         # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
         keyword_scoring.main(company_ceo_name, start_date, end_date)
+
+        # 키워드비교 스코어링 (완료)
+        # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        compared_articles.main(company_ceo_name, start_date, end_date)
 
 
 if __name__ == '__main__':
