@@ -31,7 +31,7 @@ def DailyMain():
     company_ceo_name_list = ['하이브+방시혁']
     # company_ceo_name_list = ['포스코+장인화']
     for company_ceo_name in company_ceo_name_list:
-        start_date = "2023.07.12"
+        start_date = "2024.06.10"
         end_date = "2023.01.01"  # 하이브
         # end_date = "2024.01.01"  # 포스코
         is_public = True
