@@ -9,16 +9,14 @@ import ScoringByBert.bert_scoring as bert_scoring
 import ScoringByKeyword.keyword_scoring as keyword_scoring
 import CompareByKeyword.compared_articles as compared_articles
 import SummarizeArticles.summaize_articles as summaize_articles
-import dart.dart as dart
+import dart.dart_corp_list as dart_corp_list
 
 def DailyMain():
     yesterday = datetime.now() - timedelta(days=1)
     formatted_yesterday = yesterday.strftime('%Y.%m.%d')
 
-    '''
-    # 종목정보 저장 (csv 파일은 일단 수동 저장필요함)
-    cf.insert_Korean_all_code_info_to_DB()
-    '''
+    # 상장 종목정보 저장
+    dart_corp_list.main()
 
     # 뉴스기사 crawling (네이버, 다음)
     # company_ceo_name_list = cf.get_company_ceo_name()
@@ -36,13 +34,11 @@ def DailyMain():
         # end_date = "2024.01.01"  # 포스코
         is_public = True
 
-        # article crawling (완료) (커뮤니티 점검필요)
-        # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
-        crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
+        # # article crawling (완료) (커뮤니티 점검필요)
+        # # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
+        # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
         # dart 공시자료 추가
-        # dart.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        # dart.main(company_ceo_name, start_date, end_date)
         # start_date = "2020.11.30"
         # end_date = "2020.11.30"
         # dart.main(company_ceo_name, start_date, end_date)
@@ -62,21 +58,21 @@ def DailyMain():
         # end_date = "2018.11.01"
         # dart.main(company_ceo_name, start_date, end_date)
 
-        # 특정날짜 특정기업 기사 한줄요약 (완료)
-        # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        summaize_articles.main(company_ceo_name, start_date, end_date)
+        # # 특정날짜 특정기업 기사 한줄요약 (완료)
+        # # summaize_articles.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # summaize_articles.main(company_ceo_name, start_date, end_date)
 
-        # bert 스코어링 결과 저장 (완료)
-        # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        bert_scoring.main(company_ceo_name, start_date, end_date)
+        # # bert 스코어링 결과 저장 (완료)
+        # # bert_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # bert_scoring.main(company_ceo_name, start_date, end_date)
         
-        # keyword로 스코어링 결과 저장 (완료)
-        # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        keyword_scoring.main(company_ceo_name, start_date, end_date)
+        # # keyword로 스코어링 결과 저장 (완료)
+        # # keyword_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # keyword_scoring.main(company_ceo_name, start_date, end_date)
 
-        # 키워드비교 스코어링 (완료)
-        # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
-        compared_articles.main(company_ceo_name, start_date, end_date)
+        # # 키워드비교 스코어링 (완료)
+        # # compare_scoring.main(company_ceo_name, formatted_yesterday, formatted_yesterday)
+        # compared_articles.main(company_ceo_name, start_date, end_date)
 
 
 if __name__ == '__main__':
