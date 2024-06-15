@@ -1,6 +1,5 @@
 import CommonFunction as cf
 import dart_fss as dart_fss
-from dart_fss import get_corp_list
 import pandas as pd
 import requests
 
@@ -9,7 +8,6 @@ def main():
     dart_fss.set_api_key(api_key=cf.DART_API_KEY)
     # print (dart_fss)
 
-    corp_list = get_corp_list()
     api_url = "https://opendart.fss.or.kr/api/company.json"
 
     all_corp = dart_fss.api.filings.get_corp_code()
@@ -37,7 +35,7 @@ def main():
     CREATE TABLE IF NOT EXISTS Korean_company_risk_data_meta.company_list (
     seq bigint NOT NULL AUTO_INCREMENT,
     corp_code varchar(50) DEFAULT NULL COMMENT 'dart기업코드',
-    corp_name varchar(50) DEFAULT NULL COMMENT '기업이름,
+    corp_name varchar(50) DEFAULT NULL COMMENT '기업이름',
     ceo_name varchar(50) DEFAULT NULL COMMENT 'ceo이름',
     stock_code varchar(50) DEFAULT NULL COMMENT '주식코드',
     modify_date varchar(50) DEFAULT NULL COMMENT 'dart수정일',
@@ -64,20 +62,21 @@ def main():
             'crtfc_key': cf.DART_API_KEY,
             'corp_code': row["corp_code"]
         }
-        response = requests.get(api_url, params=params)
+        with requests.Session() as session:
+            session.verify = False
+            response = session.get(api_url, params=params)
         data = response.json()
-        ceo_name = data['ceo_nm']
-        print (corp_list.find_by_corp_code(row["corp_code"]))
+        # print (data)
         insert_query = f'''
             INSERT INTO Korean_company_risk_data_meta.company_list
-            ({df_listed_columns}, load_date)
+            ({df_listed_columns}, ceo_name, load_date)
             VALUES
-            ('{row["corp_code"]}', '{row["corp_name"]}', '{ceo_name}',
-            '{row["stock_code"]}','{row["modify_date"]}', NOW())
+            ('{row["corp_code"]}', '{row["corp_name"]}', '{row["stock_code"]}',
+            '{row["modify_date"]}', '{data['ceo_nm']}', NOW())
             ON DUPLICATE KEY UPDATE 
             corp_name=VALUES(corp_name)
         '''
-        # print (insert_query)
+        # print (insertquery)
         # break  # for debug
         cursor.execute(insert_query)
         conn.commit()
