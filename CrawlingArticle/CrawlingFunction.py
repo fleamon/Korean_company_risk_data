@@ -29,7 +29,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
             # joongang_news_crawler(query, crawling_date_id, '중앙일보')
-            donga_news_crawler(query, crawling_date_id, '동아일보')
+            # donga_news_crawler(query, crawling_date_id, '동아일보')
+            gyeonghyang_news_crawler(query, crawling_date_id, '경향신문')
             # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
             # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
             # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
@@ -88,6 +89,34 @@ def joongang_news_crawler(query, crawling_date_id, news_agency):
 
 
 def donga_news_crawler(query, crawling_date_id, news_agency):
+    crawling_date_id = crawling_date_id.replace(".","")
+    print (f'crawling_date_id = {crawling_date_id}')
+    
+    url = f"https://www.donga.com/news/search?query={query}&sorting=1&check_news=91&search_date=5&v1={crawling_date_id}&v2={crawling_date_id}&more=1"
+    print ("url :", url)
+    original_html = requests.get(url, headers=cf.headers)
+    print ("original_html status : ", original_html)
+
+    html = BeautifulSoup(original_html.text, "html.parser")
+
+    article_list = html.find_all("article", class_="news_card")
+    if len(article_list) == 0:
+        cf.time_sleep(5)
+        return
+    for article in article_list:
+        article_link = article.find('a')['href']
+        article_url = requests.get(article_link, headers=cf.headers)
+        article_html = BeautifulSoup(article_url.text, "html.parser")
+        date_time = article_html.find('span', {'aria-hidden': 'true'}).text
+        title = cf.delete_patterns(article_html.find('title').text.split('｜')[0])
+        article_text = cf.delete_patterns(article_html.find('section', class_='news_view').text)
+        
+        cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        
+    cf.time_sleep(5)
+
+
+def gyeonghyang_news_crawler(query, crawling_date_id, news_agency):
     crawling_date_id = crawling_date_id.replace(".","")
     print (f'crawling_date_id = {crawling_date_id}')
     
