@@ -16,27 +16,28 @@ def DailyMain():
     formatted_yesterday = yesterday.strftime('%Y.%m.%d')
 
     # 상장 종목정보 저장
-    dart_corp_list.main()
+    # dart_corp_list.main()
 
     # 뉴스기사 crawling (네이버, 다음)
     # company_ceo_name_list = cf.get_company_ceo_name()
     # company_ceo_name_list = company_ceo_name_list[0:50]  # test
     # company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용', '현대자동차+정의선', 'LG+구광모', 'SK+최태원']
-    # company_ceo_name_list = ['카카오+김범수']
+    company_ceo_name_list = ['카카오+김범수']
     # company_ceo_name_list = ['삼성전자+이재용']
     # company_ceo_name_list = ['한진+조원태', '대한항공+조원태', '한진칼+조원태']
     # company_ceo_name_list = ['한진칼,한진,대한항공+조원태']
-    company_ceo_name_list = ['하이브+방시혁']
+    # company_ceo_name_list = ['하이브+방시혁']
     # company_ceo_name_list = ['포스코+장인화']
     for company_ceo_name in company_ceo_name_list:
         start_date = "2024.06.10"
-        end_date = "2023.01.01"  # 하이브
+        end_date = "2024.06.10"
+        # end_date = "2023.01.01"  # 하이브
         # end_date = "2024.01.01"  # 포스코
         is_public = True
 
-        # # article crawling (완료) (커뮤니티 점검필요)
-        # # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
-        # crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
+        # article crawling (완료) (커뮤니티 점검필요)
+        # crawl.crawling_articles_from_keyword(company_ceo_name, formatted_yesterday, formatted_yesterday, is_public)
+        crawl.crawling_articles_from_keyword(company_ceo_name, start_date, end_date, is_public)
 
         # dart 공시자료 추가
         # start_date = "2020.11.30"
