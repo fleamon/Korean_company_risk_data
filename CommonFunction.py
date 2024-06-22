@@ -18,7 +18,8 @@ with open(f'{path}/env/config.yaml', encoding='UTF-8') as f:
 
 DISCORD_WEBHOOK_URL = _cfg['DISCORD_WEBHOOK_URL']
 DART_API_KEY = _cfg['DART_API_KEY']
-headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.4459.183 Safari/537.36"}
+# headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.4459.183 Safari/537.36"}
+headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0"}
 
 
 def connect_to_db():
@@ -62,52 +63,40 @@ def get_company_ceo_name():
     return company_ceo_name_list
 
 
-def result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name):
+def result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text):
     if "+" in query:
         company_name = query.split("+")[0]
     else:
         company_name = query
-
-    result= {
-            "article_reg_date" : article_reg_date
-            , "article_link": article_link
-            , "company_name": company_name
-            , "news_agency" : news_agency
-            , "titles" : titles
-            , "article_text": article_text
-            }
-    df = pd.DataFrame(result)  # df로 변환
-    df = df.drop_duplicates()
 
     # DB에 delete - insert
     conn = connect_to_db()
     cursor = conn.cursor()
 
     delete_query = f'''
-        DELETE FROM stock_Korean_by_ESG_BackData.articles
-            WHERE article_reg_date = '{crawling_date_id.replace(".","-")}'
-            AND search_keyword = '{query}'
-            AND portal_name = '{portal_name}'
+        DELETE FROM Korean_company_risk_backdata.articles
+            WHERE news_agency = '{news_agency}'
+            AND article_link = '{article_link}'
             AND company_name = '{company_name}'
+            AND search_keyword = '{query}'
     '''
     # print (delete_query)
     cursor.execute(delete_query)
 
-    for index, row in df.iterrows():
-        insert_query = f'''
-            INSERT INTO stock_Korean_by_ESG_BackData.articles 
-            (article_reg_date, portal_name, article_link, company_name, news_agency, search_keyword, title, article_text, load_date)
-            VALUES 
-            ('{row["article_reg_date"]}', '{portal_name}', '{row["article_link"]}'
-            , '{row["company_name"]}', '{row["news_agency"]}', '{query}'
-            , '{row["titles"]}', '{row["article_text"]}', NOW())
-            ON DUPLICATE KEY UPDATE 
-            article_link=VALUES(article_link), 
-            title=VALUES(title), 
-            article_text=VALUES(article_text)
-        '''
-        # print (insert_query)
-        cursor.execute(insert_query)
+    insert_query = f'''
+        INSERT INTO Korean_company_risk_backdata.articles 
+        (datetime_id, news_agency, article_link, company_name, search_keyword, title, article_text, load_date)
+        VALUES 
+        ('{date_time}', '{news_agency}', '{article_link}', '{company_name}'
+        , '{query}', '{title}', '{article_text}', NOW())
+        ON DUPLICATE KEY UPDATE 
+        news_agency=VALUES(news_agency),
+        article_link=VALUES(article_link),
+        company_name=VALUES(company_name),
+        search_keyword=VALUES(search_keyword)
+    '''
+    # print (insert_query)
+    cursor.execute(insert_query)
         
     conn.commit()
     cursor.close()
@@ -126,6 +115,11 @@ def delete_patterns(value):
         value = re.sub(pattern=pattern, repl='', string=str(value))
     
     return value
+
+
+def time_sleep(sec):
+    print (f"{sec} seconds sleep...")
+    time.sleep(sec)
 
 
 def send_message(market, msg):

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import time
 from bs4 import BeautifulSoup
 import CommonFunction as cf
+from urllib.robotparser import RobotFileParser
 
 
 def crawling_articles_from_keyword(query, start_date, end_date, is_public):
@@ -13,11 +14,12 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
     # 상장회사는 Korean_all_code_info 매일 모두 크롤링, 비상장회사는 필요한 회사 받아오도록 수정
     print([time.strftime('%Y-%m-%d %H:%M:%S')], "!!!!! DEBUG PRINT : 뉴스기사 DB 저장 !!!!!")
     try:
-        dummypage = 1  # 사용하지 않는 변수
-        dummysort = 1  # 사용하지 않는 변수
-        maxpage = "1"  # 검색어 넣은 마지막 페이지
-        naver_sort = "0"  # 0:관련도순, 1:최신순, 2:오래된순
-        daum_sort = "accuracy"  # accuracy:정확도순, recency:최신순, old:오래된순
+        # dummypage = 1  # 사용하지 않는 변수
+        # dummysort = 1  # 사용하지 않는 변수
+        # maxpage = "1"  # 검색어 넣은 마지막 페이지
+        # naver_sort = "0"  # 0:관련도순, 1:최신순, 2:오래된순
+        sort = "1"
+        # daum_sort = "accuracy"  # accuracy:정확도순, recency:최신순, old:오래된순
         print (query)
         start_datetime = datetime.strptime(start_date, "%Y.%m.%d")
         end_datetime = datetime.strptime(end_date, "%Y.%m.%d")
@@ -26,8 +28,9 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         while current_datetime >= end_datetime:
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
-            naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
-            daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
+            joongang_news_crawler(query, crawling_date_id, '중앙일보')
+            # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
+            # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
             # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
             # fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, '에펨코리아')
             # clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, '클리앙')
@@ -37,9 +40,53 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
         
     except Exception as e:
         cf.send_message("ERROR", f"뉴스기사 DB 저장 [오류 발생]{e}")
-        time.sleep(1)
+        cf.time_sleep(1)
 
 
+def chosun_news_crawler(query, sort, crawling_date_id, news_agency):
+    next_crawling_date_id = datetime.strptime(crawling_date_id, "%Y.%m.%d")
+    crawling_date_id = crawling_date_id.replace(".","")
+    next_crawling_date_id += timedelta(days=1)
+    next_crawling_date_id = str(next_crawling_date_id.strftime("%Y.%m.%d"))
+    next_crawling_date_id = next_crawling_date_id.replace(".","")
+    print (f'crawling_date_id = {crawling_date_id}')
+    # print (f'next_crawling_date_id = {next_crawling_date_id}')
+    crawling_date_id = "20240605"
+    next_crawling_date_id = "20240611"
+
+
+def joongang_news_crawler(query, crawling_date_id, news_agency):
+    crawling_date_id = crawling_date_id.replace(".","-")
+    print (f'crawling_date_id = {crawling_date_id}')
+    
+    url = f"https://www.joongang.co.kr/search/unifiedsearch?keyword={query}&startDate={crawling_date_id}&endDate={crawling_date_id}&searchin=&accurateWord=&stopword=&sfield=all"
+    print ("url :", url)
+    original_html = requests.get(url, headers=cf.headers)
+    print ("original_html status : ", original_html)
+
+    html = BeautifulSoup(original_html.text, "html.parser")
+
+    article_list = html.find_all("ul", class_="story_list")
+    if len(article_list) == 0:
+        cf.time_sleep(5)
+        return
+    
+    articles = article_list[0].find_all('li')
+    for article in articles:
+        date_time = article.find('p', class_='date').text
+        article_url = requests.get(article.find('a')['href'], headers=cf.headers)
+        article_html = BeautifulSoup(article_url.text, "html.parser")
+        article_link = article.find('a')['href']
+        title = cf.delete_patterns(article_html.find('h1').text)
+        article_texts = [p.get_text() for p in article_html.find_all('p') if p.has_attr('data-divno')]
+        article_text = cf.delete_patterns("".join(article_texts))
+        
+        cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        
+    cf.time_sleep(5)
+
+
+"""
 def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name):
     # 각 크롤링 결과 저장하기 위한 리스트 선언 
     print (f'crawling_date_id = {crawling_date_id}')
@@ -105,8 +152,7 @@ def naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, portal_name
         article_link.remove(remove_url)
 
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
-    print ("5 seconds sleep...")
-    time.sleep(5)
+    cf.time_sleep(5)
 
 
 def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
@@ -160,8 +206,7 @@ def daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, portal_name):
             article_reg_date.append(crawling_date_id.replace(".", "-"))
 
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
-    print ("5 seconds sleep...")
-    time.sleep(5)
+    cf.time_sleep(5)
 
 
 def dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
@@ -226,8 +271,7 @@ def dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, por
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
-    print ("5 seconds sleep...")
-    time.sleep(5)
+    cf.time_sleep(5)
 
 
 def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
@@ -264,8 +308,7 @@ def fmkorea_articles_crawler(dummypage, query, dummysort, crawling_date_id, port
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
-    print ("5 seconds sleep...")
-    time.sleep(5)
+    cf.time_sleep(5)
 
 
 def clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal_name):
@@ -299,5 +342,5 @@ def clien_articles_crawler(dummypage, query, dummysort, crawling_date_id, portal
             article_text.append(article_content)
             
     cf.result_delete_insert_to_db_articles_table(query, article_reg_date, article_link, news_agency, titles, article_text, crawling_date_id, portal_name)
-    print ("5 seconds sleep...")
-    time.sleep(5)
+    cf.time_sleep(5)
+"""
