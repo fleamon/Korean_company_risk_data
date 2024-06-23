@@ -86,6 +86,7 @@ def joongang_news_crawler(query, crawling_date_id, news_agency):
         article_text = cf.delete_patterns("".join(article_texts))
         
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        cf.time_sleep(1)
         
     cf.time_sleep(5)
 
@@ -114,6 +115,7 @@ def donga_news_crawler(query, crawling_date_id, news_agency):
         article_text = cf.delete_patterns(article_html.find('section', class_='news_view').text)
         
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        cf.time_sleep(1)
         
     cf.time_sleep(5)
 
@@ -143,6 +145,7 @@ def gyeonghyang_news_crawler(query, crawling_date_id, news_agency):
         article_text = cf.delete_patterns("".join(article_texts))
         
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        cf.time_sleep(1)
         
     cf.time_sleep(5)
 
@@ -173,6 +176,7 @@ def hangyeole_news_crawler(query, crawling_date_id, news_agency):
         article_text = cf.delete_patterns(data['props']['pageProps']['article']['content'])
         
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        cf.time_sleep(1)
         
     cf.time_sleep(5)
 
