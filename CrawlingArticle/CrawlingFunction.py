@@ -4,6 +4,7 @@ import time
 from bs4 import BeautifulSoup
 import CommonFunction as cf
 from urllib.robotparser import RobotFileParser
+import json
 
 
 def crawling_articles_from_keyword(query, start_date, end_date, is_public):
@@ -30,7 +31,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             current_datetime -= timedelta(days=1)
             # joongang_news_crawler(query, crawling_date_id, '중앙일보')
             # donga_news_crawler(query, crawling_date_id, '동아일보')
-            gyeonghyang_news_crawler(query, crawling_date_id, '경향신문')
+            # gyeonghyang_news_crawler(query, crawling_date_id, '경향신문')
+            hangyeole_news_crawler(query, crawling_date_id, '한겨레')
             # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
             # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
             # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
@@ -139,6 +141,36 @@ def gyeonghyang_news_crawler(query, crawling_date_id, news_agency):
         title = cf.delete_patterns(article_html.find('h1', class_='headline'))
         article_texts = [p.get_text() for p in article_html.find_all('p', class_='content_text text-l')]
         article_text = cf.delete_patterns("".join(article_texts))
+        
+        cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        
+    cf.time_sleep(5)
+
+
+def hangyeole_news_crawler(query, crawling_date_id, news_agency):
+    crawling_date_id = crawling_date_id.replace(".","")
+    print (f'crawling_date_id = {crawling_date_id}')
+    
+    url = f"https://search.hani.co.kr/search/newslist?searchword={query}&sort=desc&startdate={crawling_date_id}&enddate={crawling_date_id}&dt=searchPeriod"
+    print ("url :", url)
+    original_html = requests.get(url, headers=cf.headers)
+    print ("original_html status : ", original_html)
+
+    html = BeautifulSoup(original_html.text, "html.parser")
+
+    article_list = html.find_all('a', class_='flex-inner')
+    if len(article_list) == 0:
+        cf.time_sleep(5)
+        return
+    for article in article_list:
+        article_link = article['href']
+        article_url = requests.get(article_link, headers=cf.headers)
+        article_html = BeautifulSoup(article_url.text, "html.parser")
+        script_tag = article_html.find('script', id='__NEXT_DATA__')
+        data = json.loads(script_tag.string)
+        date_time = data['props']['pageProps']['article']['createDate']
+        title = cf.delete_patterns(article_html.find('title').text)
+        article_text = cf.delete_patterns(data['props']['pageProps']['article']['content'])
         
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
         

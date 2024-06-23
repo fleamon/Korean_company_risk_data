@@ -22,15 +22,15 @@ def DailyMain():
     # company_ceo_name_list = cf.get_company_ceo_name()
     # company_ceo_name_list = company_ceo_name_list[0:50]  # test
     # company_ceo_name_list = ['카카오+김범수', '삼성전자+이재용', '현대자동차+정의선', 'LG+구광모', 'SK+최태원']
-    company_ceo_name_list = ['카카오+김범수']
-    # company_ceo_name_list = ['삼성전자+이재용']
+    # company_ceo_name_list = ['카카오+김범수']
+    company_ceo_name_list = ['삼성전자+이재용']
     # company_ceo_name_list = ['한진+조원태', '대한항공+조원태', '한진칼+조원태']
     # company_ceo_name_list = ['한진칼,한진,대한항공+조원태']
     # company_ceo_name_list = ['하이브+방시혁']
     # company_ceo_name_list = ['포스코+장인화']
     for company_ceo_name in company_ceo_name_list:
-        start_date = "2024.06.10"
-        end_date = "2024.06.10"
+        start_date = "2024.06.11"
+        end_date = "2024.06.11"
         # end_date = "2024.05.01"
         # end_date = "2023.01.01"  # 하이브
         # end_date = "2024.01.01"  # 포스코
