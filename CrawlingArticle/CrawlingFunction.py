@@ -120,14 +120,14 @@ def gyeonghyang_news_crawler(query, crawling_date_id, news_agency):
     crawling_date_id = crawling_date_id.replace(".","")
     print (f'crawling_date_id = {crawling_date_id}')
     
-    url = f"https://www.donga.com/news/search?query={query}&sorting=1&check_news=91&search_date=5&v1={crawling_date_id}&v2={crawling_date_id}&more=1"
+    url = f"https://search.khan.co.kr/search.html?stb=khan&dm=5&d1={crawling_date_id}~{crawling_date_id}&q={query}"
     print ("url :", url)
     original_html = requests.get(url, headers=cf.headers)
     print ("original_html status : ", original_html)
 
     html = BeautifulSoup(original_html.text, "html.parser")
 
-    article_list = html.find_all("article", class_="news_card")
+    article_list = html.find_all('dl', class_='phArtc')
     if len(article_list) == 0:
         cf.time_sleep(5)
         return
@@ -135,9 +135,10 @@ def gyeonghyang_news_crawler(query, crawling_date_id, news_agency):
         article_link = article.find('a')['href']
         article_url = requests.get(article_link, headers=cf.headers)
         article_html = BeautifulSoup(article_url.text, "html.parser")
-        date_time = article_html.find('span', {'aria-hidden': 'true'}).text
-        title = cf.delete_patterns(article_html.find('title').text.split('｜')[0])
-        article_text = cf.delete_patterns(article_html.find('section', class_='news_view').text)
+        date_time = article_html.find('div', class_='byline').find('em').text.split(' : ')[1]
+        title = cf.delete_patterns(article_html.find('h1', class_='headline'))
+        article_texts = [p.get_text() for p in article_html.find_all('p', class_='content_text text-l')]
+        article_text = cf.delete_patterns("".join(article_texts))
         
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
         
