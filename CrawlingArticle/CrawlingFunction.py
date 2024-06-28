@@ -32,7 +32,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             # joongang_news_crawler(query, crawling_date_id, '중앙일보')
             # donga_news_crawler(query, crawling_date_id, '동아일보')
             # gyeonghyang_news_crawler(query, crawling_date_id, '경향신문')
-            hangyeole_news_crawler(query, crawling_date_id, '한겨레')
+            # hangyeole_news_crawler(query, crawling_date_id, '한겨레')
+            oh_my_news_crawler(query, crawling_date_id, '오마이뉴스')
             # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
             # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
             # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
@@ -175,6 +176,40 @@ def hangyeole_news_crawler(query, crawling_date_id, news_agency):
         title = cf.delete_patterns(article_html.find('title').text)
         article_text = cf.delete_patterns(data['props']['pageProps']['article']['content'])
         
+        cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        cf.time_sleep(1)
+        
+    cf.time_sleep(5)
+
+
+def oh_my_news_crawler(query, crawling_date_id, news_agency):
+    print (f'crawling_date_id = {crawling_date_id}')
+    crawling_year = crawling_date_id.split('.')[0]
+    crawling_month = crawling_date_id.split('.')[1]
+    crawling_day = crawling_date_id.split('.')[2]
+    
+    url = f"https://www.ohmynews.com/NWS_Web/Search/s_ohmynews_sub.aspx?keyword={query}&srh_area=0&srhdate=2&s_year={crawling_year}&s_month={crawling_month}&s_day={crawling_day}&e_year={crawling_year}&e_month={crawling_month}&e_day={crawling_day}&section_code=0&area_code=0&form_code=0&option=on&pv=news"
+    print ("url :", url)
+    original_html = requests.get(url, headers=cf.headers)
+    print ("original_html status : ", original_html)
+
+    html = BeautifulSoup(original_html.text, "html.parser")
+
+    article_list = html.find_all('div', class_='newest_area')
+    if len(article_list) == 0:
+        cf.time_sleep(5)
+        return
+    for article in article_list:
+        article_link = 'https://www.ohmynews.com/' + article.find('a')['href']
+        date_time = article.find('span', class_='lis-date').text
+        title = cf.delete_patterns(article.find('strong', class_='title').text)
+        article_url = requests.get(article_link, headers=cf.headers)
+        article_html = BeautifulSoup(article_url.text, "html.parser")
+        for table_tag in article_html.find_all('table'):
+            table_tag.decompose()
+
+        article_text = article_html.find('div', class_='at_contents').text
+        article_text = cf.delete_patterns(article_html.find('div', class_='at_contents').text)
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
         cf.time_sleep(1)
         
