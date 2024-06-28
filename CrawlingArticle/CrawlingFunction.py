@@ -33,7 +33,8 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             # donga_news_crawler(query, crawling_date_id, '동아일보')
             # gyeonghyang_news_crawler(query, crawling_date_id, '경향신문')
             # hangyeole_news_crawler(query, crawling_date_id, '한겨레')
-            oh_my_news_crawler(query, crawling_date_id, '오마이뉴스')
+            # oh_my_news_crawler(query, crawling_date_id, '오마이뉴스')
+            Korea_news_crawler(query, crawling_date_id, '한국일보')
             # naver_news_crawler(maxpage, query, naver_sort, crawling_date_id, '네이버')
             # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
             # dcinside_articles_crawler(dummypage, query, dummysort, crawling_date_id, '디시인사이드')
@@ -46,18 +47,6 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
     except Exception as e:
         cf.send_message("ERROR", f"뉴스기사 DB 저장 [오류 발생]{e}")
         cf.time_sleep(1)
-
-
-def chosun_news_crawler(query, sort, crawling_date_id, news_agency):
-    next_crawling_date_id = datetime.strptime(crawling_date_id, "%Y.%m.%d")
-    crawling_date_id = crawling_date_id.replace(".","")
-    next_crawling_date_id += timedelta(days=1)
-    next_crawling_date_id = str(next_crawling_date_id.strftime("%Y.%m.%d"))
-    next_crawling_date_id = next_crawling_date_id.replace(".","")
-    print (f'crawling_date_id = {crawling_date_id}')
-    # print (f'next_crawling_date_id = {next_crawling_date_id}')
-    crawling_date_id = "20240605"
-    next_crawling_date_id = "20240611"
 
 
 def joongang_news_crawler(query, crawling_date_id, news_agency):
@@ -210,6 +199,37 @@ def oh_my_news_crawler(query, crawling_date_id, news_agency):
 
         article_text = article_html.find('div', class_='at_contents').text
         article_text = cf.delete_patterns(article_html.find('div', class_='at_contents').text)
+        cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
+        cf.time_sleep(1)
+        
+    cf.time_sleep(5)
+
+
+def Korea_news_crawler(query, crawling_date_id, news_agency):
+    crawling_date_id = crawling_date_id.replace(".","/")
+    print (f'crawling_date_id = {crawling_date_id}')
+    
+    url = f"https://search.hankookilbo.com/Search?tab=NEWS&sort=relation&searchText={query}&searchTypeSet=TITLE,CONTENTS&startDate={crawling_date_id}%2000:00:00&endDate={crawling_date_id}%2023:59:59&selectedPeriod=manual&filter=head"
+    print ("url :", url)
+    original_html = requests.get(url, headers=cf.headers)
+    print ("original_html status : ", original_html)
+
+    html = BeautifulSoup(original_html.text, "html.parser")
+    
+    article_list = html.find_all('div', class_='inn')
+    filtered_articles = [article for article in article_list if 'mb_only' not in article.get('class', [])]
+    if len(filtered_articles) == 0:
+        cf.time_sleep(5)
+        return
+    for article in filtered_articles:
+        article_link = article.find('a')['href']
+        date_time = article.find('p', class_='date pc_only').find('em').text
+        title = cf.delete_patterns(article.find('h3', class_='board-list h3 pc_only').text)
+        article_url = requests.get(article_link, headers=cf.headers)
+        article_html = BeautifulSoup(article_url.text, "html.parser")
+    
+        article_texts = [p.get_text() for p in article_html.find_all('p', class_='editor-p')]
+        article_text = cf.delete_patterns("".join(article_texts))
         cf.result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text)
         cf.time_sleep(1)
         
