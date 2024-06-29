@@ -35,7 +35,7 @@ def crawling_articles_from_keyword(query, start_date, end_date, is_public):
             crawling_date_id = str(current_datetime.strftime("%Y.%m.%d"))
             current_datetime -= timedelta(days=1)
             naver_news_crawler(query, crawling_date_id, '네이버')
-            # daum_news_crawler(maxpage, query, daum_sort, crawling_date_id, '다음')
+            # daum_news_crawler(query, crawling_date_id, '다음')
 
         cf.send_message("KOR", f"{query} 뉴스기사 DB 저장 success!")
         print(f"{query} 뉴스기사 DB 저장 successfully.")
