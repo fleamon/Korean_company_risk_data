@@ -63,7 +63,7 @@ def get_company_ceo_name():
     return company_ceo_name_list
 
 
-def result_delete_insert_to_db_articles_table(date_time, news_agency, article_link, query, title, article_text):
+def result_delete_insert_to_db_articles_table(date_time, news_agency, portal_name, article_link, query, title, article_text):
     if "+" in query:
         company_name = query.split("+")[0]
     else:
@@ -76,6 +76,7 @@ def result_delete_insert_to_db_articles_table(date_time, news_agency, article_li
     delete_query = f'''
         DELETE FROM Korean_company_risk_backdata.articles
             WHERE news_agency = '{news_agency}'
+            AND portal_name = '{portal_name}'
             AND article_link = '{article_link}'
             AND company_name = '{company_name}'
             AND search_keyword = '{query}'
@@ -85,12 +86,13 @@ def result_delete_insert_to_db_articles_table(date_time, news_agency, article_li
 
     insert_query = f'''
         INSERT INTO Korean_company_risk_backdata.articles 
-        (datetime_id, news_agency, article_link, company_name, search_keyword, title, article_text, load_date)
+        (datetime_id, news_agency, portal_name, article_link, company_name, search_keyword, title, article_text, load_date)
         VALUES 
-        ('{date_time}', '{news_agency}', '{article_link}', '{company_name}'
+        ('{date_time}', '{news_agency}', '{portal_name}', '{article_link}', '{company_name}'
         , '{query}', '{title}', '{article_text}', NOW())
         ON DUPLICATE KEY UPDATE 
         news_agency=VALUES(news_agency),
+        portal_name=VALUES(portal_name),
         article_link=VALUES(article_link),
         company_name=VALUES(company_name),
         search_keyword=VALUES(search_keyword)
