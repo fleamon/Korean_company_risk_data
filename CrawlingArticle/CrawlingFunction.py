@@ -49,8 +49,7 @@ def naver_news_crawler(query, crawling_date_id, portal_name):
     print (f'crawling_date_id = {crawling_date_id}')
     
     for agency_key, agency_value in news_agencies.items():
-        # url = f"https://search.naver.com/search.naver?where=news&query={query}&pd=3&ds={crawling_date_id}&de={crawling_date_id}&mynews=1&office_type=1&news_office_checked={agency_key}"
-        url = f"https://search.naver.com/search.naver?where=news&query={query}&pd=3&ds=2024.06.01&de={crawling_date_id}&mynews=1&office_type=1&news_office_checked={agency_key}"
+        url = f"https://search.naver.com/search.naver?where=news&query={query}&pd=3&ds={crawling_date_id}&de={crawling_date_id}&mynews=1&office_type=1&news_office_checked={agency_key}"
         print ("url :", url)
         response = requests.get(url, headers=cf.headers)
         print ("response status : ", response)
