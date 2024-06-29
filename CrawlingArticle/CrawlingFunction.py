@@ -241,8 +241,7 @@ def seoul_news_crawler(query, crawling_date_id, news_agency):
     crawling_date_id = crawling_date_id.replace(".","-")
     print (f'crawling_date_id = {crawling_date_id}')
     
-    # url = f"https://www.seoul.co.kr:8888/index.php?scope=&sort=&cpCode=seoul;nownews&period=&sDate={crawling_date_id}&eDate={crawling_date_id}&keyword={query}&iCategory=&pCategory=undefined#google_vignette"
-    url = f"https://www.seoul.co.kr:8888/index.php?scope=&sort=&cpCode=seoul;nownews&period=&sDate=2024-06-05&eDate=2024-06-11&keyword={query}&iCategory=&pCategory=undefined#google_vignette"
+    url = f"https://www.seoul.co.kr:8888/index.php?scope=&sort=&cpCode=seoul;nownews&period=&sDate={crawling_date_id}&eDate={crawling_date_id}&keyword={query}&iCategory=&pCategory=undefined#google_vignette"
     print ("url :", url)
     original_html = requests.get(url, headers=cf.headers)
     print ("original_html status : ", original_html)
